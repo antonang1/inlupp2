@@ -1,7 +1,7 @@
 #include <CUnit/Basic.h>
 #include "linked_list.h"
 #include "list_iterator.h"
-#include "../ht_v1/common.h"
+#include "common.h"
 
 typedef union element elem_t;
 

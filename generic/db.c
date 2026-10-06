@@ -3,12 +3,15 @@
 #include <string.h>
 #include <ctype.h>
 #include "utils.h"
+#include "linked_list.h"
 
 struct item {
     char *name;
     char *desc;
     int price;
     char *shelf;
+    ioopm_list_t *locs;
+
 };
 
 typedef struct item item_t;

@@ -1,5 +1,5 @@
 #include <CUnit/Basic.h>
-#include "hash_table3.h"
+#include "hash_table.h"
 #include "hash_table_iterator.h"
 #include "common.h"
 
