@@ -10,7 +10,6 @@ struct item {
     char *desc;
     int price;
     char *shelf;
-    ioopm_list_t *locs;
 
 };
 
