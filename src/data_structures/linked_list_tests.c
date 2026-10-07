@@ -2,6 +2,7 @@
 #include "linked_list.h"
 #include "list_iterator.h"
 #include "common.h"
+#include <stdlib.h>
 
 typedef union element elem_t;
 
@@ -23,7 +24,7 @@ int clean_suite(void)
 // functions of your own.
 void test_empty(void)
 {
-  ioopm_list_t *listan = ioopm_list_create();
+  ioopm_list_t *listan = ioopm_list_create(NULL);
   CU_ASSERT_EQUAL(NULL, listan->first);
   CU_ASSERT_EQUAL(NULL, listan->last);
   CU_ASSERT_EQUAL(listan->size, 0);
@@ -32,7 +33,7 @@ void test_empty(void)
 
 void test_singleton(void)
 {
-  ioopm_list_t *listan = ioopm_list_create();
+  ioopm_list_t *listan = ioopm_list_create(NULL);
   ioopm_list_append(listan, (elem_t)67);
   CU_ASSERT_EQUAL(listan->first->head.i, 67);
   CU_ASSERT_EQUAL(listan->last->head.i, 67);
@@ -42,7 +43,7 @@ void test_singleton(void)
 
 void test_3_appends(void)
 {
-  ioopm_list_t *listan = ioopm_list_create();
+  ioopm_list_t *listan = ioopm_list_create(NULL);
   ioopm_list_append(listan, (elem_t)67);
   ioopm_list_append(listan, (elem_t)68);
   ioopm_list_append(listan, (elem_t)69);
@@ -58,7 +59,7 @@ void test_3_appends(void)
 /* deepseek */
 void test_ioopm_list_create(void)
 {
-  ioopm_list_t *list = ioopm_list_create();
+  ioopm_list_t *list = ioopm_list_create(NULL);
   CU_ASSERT_PTR_NOT_NULL(list);
   CU_ASSERT_EQUAL(list->size, 0);
   CU_ASSERT_PTR_NULL(list->first);
@@ -69,7 +70,7 @@ void test_ioopm_list_create(void)
 /* deepseek*/
 void test_ioopm_list_size(void)
 {
-  ioopm_list_t *list = ioopm_list_create();
+  ioopm_list_t *list = ioopm_list_create(NULL);
   CU_ASSERT_EQUAL(ioopm_list_size(list), 0);
 
   elem_t v1 = {.i = 10};
@@ -86,7 +87,7 @@ void test_ioopm_list_size(void)
 /* deepseek */
 void test_ioopm_list_is_empty(void)
 {
-  ioopm_list_t *list = ioopm_list_create();
+  ioopm_list_t *list = ioopm_list_create(NULL);
   CU_ASSERT_TRUE(ioopm_list_is_empty(list));
 
   elem_t v = {.i = 5};
@@ -99,7 +100,7 @@ void test_ioopm_list_is_empty(void)
 /* deepseek */
 void test_ioopm_list_prepend(void)
 {
-  ioopm_list_t *list = ioopm_list_create();
+  ioopm_list_t *list = ioopm_list_create(NULL);
 
   elem_t v1 = {.i = 10};
   ioopm_list_prepend(list, v1);
@@ -118,7 +119,7 @@ void test_ioopm_list_prepend(void)
 /* deepseek */
 void test_ioopm_list_head(void)
 {
-  ioopm_list_t *list = ioopm_list_create();
+  ioopm_list_t *list = ioopm_list_create(NULL);
 
   elem_t v1 = {.i = 10};
   ioopm_list_append(list, v1);
@@ -135,7 +136,7 @@ void test_ioopm_list_head(void)
 /* deepseek */
 void test_ioopm_list_last(void)
 {
-  ioopm_list_t *list = ioopm_list_create();
+  ioopm_list_t *list = ioopm_list_create(NULL);
 
   elem_t v1 = {.i = 10};
   ioopm_list_append(list, v1);
@@ -161,7 +162,7 @@ void test_ioopm_list_last(void)
 /* deepseek */
 void test_ioopm_list_insert(void)
 {
-  ioopm_list_t *list = ioopm_list_create();
+  ioopm_list_t *list = ioopm_list_create(NULL);
 
   elem_t v1 = {.i = 10};
   elem_t v2 = {.i = 20};
@@ -191,7 +192,7 @@ void test_ioopm_list_insert(void)
 /* deepseek */
 void test_ioopm_list_get(void)
 {
-  ioopm_list_t *list = ioopm_list_create();
+  ioopm_list_t *list = ioopm_list_create(NULL);
 
   elem_t v1 = {.i = 10};
   elem_t v2 = {.i = 20};
@@ -211,7 +212,7 @@ void test_ioopm_list_get(void)
 /* deepseek men uppdaterat till iterator av mig*/
 void test_ioopm_list_remove(void)
 {
-  ioopm_list_t *list = ioopm_list_create();
+  ioopm_list_t *list = ioopm_list_create(NULL);
 
   elem_t v1 = {.i = 10};
   elem_t v2 = {.i = 20};
@@ -235,7 +236,7 @@ void test_ioopm_list_remove(void)
 
 void test_iterator_iterate(void)
 { 
-  ioopm_list_t *list = ioopm_list_create();
+  ioopm_list_t *list = ioopm_list_create(NULL);
   elem_t v1 = {.i = 10};
   elem_t v2 = {.i = 20};
   elem_t v3 = {.i = 30};
@@ -265,7 +266,7 @@ void test_iterator_iterate(void)
 
 void test_iterator_insert(void)
 {
-  ioopm_list_t *list = ioopm_list_create();
+  ioopm_list_t *list = ioopm_list_create(NULL);
   ioopm_list_iterator_t *it = ioopm_list_iterator_create(list);
 
   elem_t v1 = {.i = 10};
@@ -287,6 +288,54 @@ void test_iterator_insert(void)
   ioopm_list_iterator_destroy(it);
   ioopm_list_destroy(list);
 }
+
+
+
+typedef struct test_shelf
+{
+  char *name;
+  size_t size;
+} test_shelf_t;
+
+void destroy_test_shelf(elem_t elem)
+{
+  test_shelf_t *shelf = elem.p;
+
+  free(shelf->name);
+  free(shelf);
+}
+
+void test_void_pointer_elements(void)
+{
+  ioopm_list_t *list = ioopm_list_create(destroy_test_shelf);
+
+  test_shelf_t *shelf1 = malloc(sizeof(test_shelf_t));
+  shelf1->name = malloc(10);
+  strcpy(shelf1->name, "Shelf 1");
+  shelf1->size = 10;
+
+  test_shelf_t *shelf2 = malloc(sizeof(test_shelf_t));
+  shelf2->name = malloc(10);
+  strcpy(shelf2->name, "Shelf 2");
+  shelf2->size = 20;
+
+  ioopm_list_append(list, (elem_t){.p = shelf1});
+  ioopm_list_append(list, (elem_t){.p = shelf2});
+
+  CU_ASSERT_EQUAL(list->size, 2);
+
+  test_shelf_t *first = ioopm_list_get(list, 0).p;
+  test_shelf_t *last = ioopm_list_get(list, 1).p;
+
+  CU_ASSERT_STRING_EQUAL(first->name, "Shelf 1");
+  CU_ASSERT_EQUAL(first->size, 10);
+
+  CU_ASSERT_STRING_EQUAL(last->name, "Shelf 2");
+  CU_ASSERT_EQUAL(last->size, 20);
+
+  ioopm_list_destroy(list);
+}
+
 
 int main()
 {
@@ -323,7 +372,8 @@ int main()
       || (CU_add_test(my_test_suite, "ioopm_list_get", test_ioopm_list_get) == NULL)
       || (CU_add_test(my_test_suite, "ioopm_list_remove", test_ioopm_list_remove) == NULL)
       || (CU_add_test(my_test_suite, "ioopm_list_iterator", test_iterator_iterate) == NULL)
-      || (CU_add_test(my_test_suite, "iterator_insert", test_iterator_insert) == NULL))
+      || (CU_add_test(my_test_suite, "iterator_insert", test_iterator_insert) == NULL)
+      || (CU_add_test(my_test_suite, "void pointer elements", test_void_pointer_elements) == NULL))
   {
     // If adding any of the tests fails, we tear down CUnit and exit
     CU_cleanup_registry();

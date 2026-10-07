@@ -3,11 +3,15 @@
 
 typedef struct list      ioopm_list_t;
 typedef struct list_node ioopm_list_node_t;
+typedef void (*elem_destroy_func)(elem_t elem); // LAGT TILL FÖR INLUPP 2, FÖR ATT KUNNA HANTERA ATT ELEM_T KAN VARA EN VOID-PEKARE
 
-struct list {
+
+struct list
+{
     ioopm_list_node_t *first;
     ioopm_list_node_t *last;
-    int size;
+    size_t size;
+    elem_destroy_func destroy;
 };
 
 struct list_node {
@@ -17,7 +21,7 @@ struct list_node {
 
 /// @brief Creates a new empty list
 /// @return an empty linked list
-ioopm_list_t *ioopm_list_create(void);
+ioopm_list_t *ioopm_list_create(elem_destroy_func destroy);
 
 /// @brief Tear down the linked list and return all its memory (but not the memory of the elements)
 /// @param list the list to be destroyed

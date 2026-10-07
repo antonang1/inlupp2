@@ -1,7 +1,10 @@
+#pragma once
 #ifndef __UTILS_H__
 #define __UTILS_H__
-
 #include <stdbool.h>
+#include <stdlib.h>
+#include "../data_structures/common.h"
+
 
 extern char *strdup(const char *);
 
@@ -14,6 +17,8 @@ typedef union {
 typedef bool check_func(char *);
 
 typedef answer_t convert_func(char *);
+
+typedef int (*comparison_func)(elem_t, elem_t);
 
 int read_string(char *buf, int buf_siz);
 
@@ -36,5 +41,7 @@ char *ask_question_shelf(char*question);
 
 void println(char *string);
 void print(char *string);
+
+void insertion_sort(elem_t *array, size_t length, comparison_func cmp);
 
 #endif 

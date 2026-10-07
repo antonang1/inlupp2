@@ -3,6 +3,10 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
+#include "utils.h"
+#include "../data_structures/common.h"
+
 
 extern char *strdup(const char *);
 
@@ -15,6 +19,8 @@ typedef union {
 typedef bool check_func(char *);
 
 typedef answer_t convert_func(char *);
+
+
 
 
 void clear_input_buffer() {
@@ -226,3 +232,20 @@ void println(char *string) {
     print(string);
     print("\n");
 }
+
+void insertion_sort(elem_t *array, size_t length, comparison_func cmp)
+{
+    for (size_t i = 1; i < length; i++)
+    {
+        elem_t current = array[i];
+        size_t j = i;
+
+        while(j > 0 && cmp(array[j - 1], current) > 0)
+        {
+            array[j] = array[j - 1];
+            j--;
+        }
+        array[j] = current;
+    }
+}
+

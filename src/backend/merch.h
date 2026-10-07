@@ -4,6 +4,15 @@
 #include "../data_structures/linked_list.h"
 #include "store.h"
 
+
+// Everything about one item, with no table in sight.
+
+// merch_create(name, desc, price)
+// merch_destroy(m)
+// merch_eq(a, b)
+// merch_print(m)
+
+
 typedef struct merch merch_t;
 
 struct merch
@@ -16,7 +25,7 @@ struct merch
 
 merch_t *merch_create(char *name, char *desc, size_t price);
 
-void merch_add_to_store(store_t *store, merch_t *merch);
+bool merch_add_to_store(store_t *store, merch_t *merch);
 
 bool merch_remove_from_store(store_t *store, merch_t *merch);
 

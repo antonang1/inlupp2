@@ -9,12 +9,17 @@
 typedef struct list ioopm_list_t;
 typedef struct list_node ioopm_list_node_t;
 
+typedef void (*elem_destroy_func)(elem_t elem); // LAGT TILL FÖR INLUPP 2, FÖR ATT KUNNA HANTERA ATT ELEM_T KAN VARA EN VOID-PEKARE
+// Function pointer used to destroy/free resources owned by an elem_t.
+// This is needed when list elements contain dynamically allocated data,
+// such as a pointer of type void stored in elem_t.
 
 struct list
 {
     ioopm_list_node_t *first;
     ioopm_list_node_t *last;
     size_t size;
+    elem_destroy_func destroy;  
 };
 
 struct list_node
@@ -23,9 +28,12 @@ struct list_node
     ioopm_list_node_t *tail;
 };  
 
-ioopm_list_t *ioopm_list_create(void)
+ioopm_list_t *ioopm_list_create(elem_destroy_func destroy)
 {
-    return calloc(1, sizeof(ioopm_list_t));
+    ioopm_list_t *list = calloc(1, sizeof(ioopm_list_t));
+    list->destroy = destroy;
+
+    return list;
 }
 
 void ioopm_list_destroy(ioopm_list_t *list)
@@ -35,6 +43,12 @@ void ioopm_list_destroy(ioopm_list_t *list)
     while (current != NULL) // Loops through the entire list and frees up the memory of the current node while saving a temporary pointer to the next one for the next iteration
     {
         ioopm_list_node_t *next = current->tail;
+
+        if (list->destroy)
+        {
+            list->destroy(current->head);
+        }
+
         free(current);
         current = next;
     }
