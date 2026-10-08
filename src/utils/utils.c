@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include "utils.h"
 #include "../data_structures/common.h"
+#include "../backend/merch.h"
 
 
 extern char *strdup(const char *);

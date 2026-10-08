@@ -14,3 +14,6 @@ struct shelf
     char *merch_name;
     size_t quantity;
 };
+
+
+int comparison_shelf(elem_t a, elem_t b);

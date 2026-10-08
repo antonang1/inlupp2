@@ -4,12 +4,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../data_structures/hash_table.h"
+#include "../data_structures/hash_table_iterator.h"
 #include <stdbool.h>
 
-static comparison_shelf(elem_t a, elem_t b)
+// RULE:
+// negative outcome: a before b
+// zero: equal
+// positive: a after b
+int comparison_shelf(elem_t a, elem_t b)
 {
     shelf_t *shelf_a = a.p;
     shelf_t *shelf_b = b.p;
+
+    if (shelf_a == NULL || shelf_b == NULL) 
+    {
+        return 0;
+    }
 
     return(strcmp(shelf_a->shelf_name, shelf_b->shelf_name));
 }
@@ -81,3 +91,25 @@ bool replenish_stock(store_t *store, char *shelf_name, char *merch_name, size_t 
 }
 
 
+// This function does not have ownership over the memeory allocated
+// ui.c does when calling this function!!! 
+elem_t *list_shelves(merch_t *merch, size_t *size_out)
+{
+    *size_out = ioopm_hash_table_size(merch->shelfs);
+    elem_t *shelves = calloc(*size_out, sizeof(elem_t));
+
+    ioopm_hash_table_iterator_t *iter = ioopm_list_iterator_create(merch->shelfs); 
+    size_t i = 0;
+
+    while (!ioopm_list_iterator_at_end(iter))
+    {
+        shelves[i].i = ioopm_list_iterator_current(iter);
+        i++;
+        ioopm_list_iterator_advance(iter);
+    }
+
+    ioopm_list_iterator_destroy(iter);
+    insertion_sort(shelves, *size_out, comparison_shelf);
+
+    return shelves;
+}

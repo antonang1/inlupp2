@@ -3,12 +3,23 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../data_structures/hash_table.h"
+#include "../data_structures/hash_table_iterator.h"
 
-static comparison_merch(elem_t a, elem_t b)
+
+// RULE:
+// negative outcome: a before b
+// zero: equal
+// positive: a after b
+int comparison_merch(elem_t a, elem_t b)
 {
     merch_t *merch_a = a.p;
     merch_t *merch_b = b.p;
-    
+
+    if (merch_a == NULL || merch_b == NULL) 
+    {
+        return 0;
+    }
+
     return strcmp(merch_a->name, merch_b->name);
 }
 
@@ -96,18 +107,25 @@ bool merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, 
 }
 
 
-
+// This function does not have ownership over the memeory allocated
+// ui.c does when calling this function!!! 
 elem_t *list_merchandise(store_t *store, size_t *size_out)
 {
     *size_out = ioopm_hash_table_size(store->merchandise);
     elem_t *merch = calloc(*size_out, sizeof(elem_t));
 
-    insertion_sort(merch, size_out, comparison_merch);
+    ioopm_hash_table_iterator_t *iter = ioopm_hash_table_iterator_create(store->merchandise);
+    size_t i = 0;
 
-    // från hashtabell till array
+    while (!ioopm_hash_table_iterator_at_end(iter))
+    {
+        merch[i] = ioopm_hash_table_iterator_current_value(iter);
+        i++;
+        ioopm_hash_table_iterator_advance(iter);
+    }
 
-    
+    ioopm_hash_table_iterator_destroy(iter);
+    insertion_sort(merch, *size_out, comparison_merch);
 
     return merch;
-    // Denna funktion ska använda sig av insertion_sort på comparison_merch
 }
