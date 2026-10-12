@@ -45,15 +45,16 @@ merch_t *merch_create(char *name, char *desc, size_t price)
 }
 
 // 2.1.1 Add Merchandise
-bool merch_add_to_store(store_t *store, merch_t *merch)
+bool merch_add_to_store(store_t *store, char *name, char *desc, size_t price)
 {  
     elem_t tmp;
-    if (ioopm_hash_table_lookup(store->merchandise, string_elem(merch->name), &tmp))
+    if (ioopm_hash_table_lookup(store->merchandise, string_elem(name), &tmp))
     {
-        merch_destroy(merch);
         return false;
     }
-    ioopm_hash_table_insert(store->merchandise, string_elem(merch->name), ptr_elem(merch));
+
+    merch_t *new_merch = merch_create(name, desc, price);
+    ioopm_hash_table_insert(store->merchandise, string_elem(new_merch->name), ptr_elem(new_merch));
     
     return true;
 
