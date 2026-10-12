@@ -124,6 +124,7 @@ bool remove_from_cart(store_t *store, size_t id, char *name, size_t quantity)
     }
     else
     {
+        // maybe not insert once again 
         ioopm_hash_table_insert(cart->items, string_elem(name), int_elem(remaining));
     }
 
@@ -133,5 +134,5 @@ bool remove_from_cart(store_t *store, size_t id, char *name, size_t quantity)
 
 int calculate_cost(store_t *store, size_t id, char *name, size_t quantitiy)
 {
-    
+
 }
