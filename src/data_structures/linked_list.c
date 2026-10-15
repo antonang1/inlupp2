@@ -62,7 +62,7 @@ void ioopm_list_append(ioopm_list_t *list, elem_t value) // allokerar minne för
 
     new_node->head = value;
     new_node->tail = NULL;
-
+    
     if (list->size == 0)
     {
         list->first = new_node;

@@ -17,7 +17,7 @@
 /// @param hash_fn pointer to hash function 
 /// @param key_eq_fn pointer to equality function 
 /// @return A new empty hash table
-ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn);
+ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn, ioopm_elem_destroy_func *elem_destroy_fn);
 
 /// @brief Delete a hash table and free its memory
 /// @param ht a hash table to be deleted

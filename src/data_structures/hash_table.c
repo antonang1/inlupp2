@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include "common.h"
 
-ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn)
+ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_eq_function *key_eq_fn, ioopm_elem_destroy_func *elem_destroy_fn)
 {
   ioopm_hash_table_t *ht = calloc(1, sizeof(ioopm_hash_table_t));
   ht->no_buckets = 17;
@@ -14,6 +14,7 @@ ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_
   ht->load_factor = 0.5;
   ht->hash = hash_fn;
   ht->is_equal = key_eq_fn;
+  ht->elem_destroy_fn = elem_destroy_fn;
 
   return ht;
 }
@@ -22,20 +23,24 @@ ioopm_hash_table_t *ioopm_hash_table_create(ioopm_hash_function *hash_fn, ioopm_
 /// @pre current is allocated in memory before this function is called
 /// @param current A pointer to the entry_t that will be freed
 /// @return void
-static void entry_destroy(entry_t *current)
+static void entry_destroy(ioopm_hash_table_t *ht, entry_t *current)
 {
+  if (ht->elem_destroy_fn)
+  {
+    ht->elem_destroy_fn(current->value);
+  }
   free(current);
 }
 
 /// @brief Frees the allocated memory of a bucket in a hash table
 /// @param e pointer to a entry_t
 /// @return void
-static void free_bucket(entry_t **current_entry)
+static void free_bucket(ioopm_hash_table_t *ht, entry_t **current_entry)
 {
   while (*current_entry != NULL) // traverse the bucket from current to the last non-NULL entry
   {
     entry_t *next = (*current_entry)->next;
-    entry_destroy(*current_entry);
+    entry_destroy(ht, *current_entry);
     *current_entry = next; // update current pointer to next entry_t
   }
 }
@@ -69,7 +74,7 @@ void ioopm_hash_table_destroy(ioopm_hash_table_t *ht)
   for (size_t index = 0; index < ht->no_buckets; index++)
   {
     entry_t **entry = &ht->buckets[index];
-    free_bucket(entry);
+    free_bucket(ht, entry);
   }
   free(ht->buckets);
   free(ht); // when all buckets only contains sentinel nodes, free ht
@@ -152,7 +157,7 @@ static void rehash_bucket(ioopm_hash_table_t *ht, entry_t **new_buckets, entry_t
     entry_t *next = (*current_bucket)->next;
 
     rehash_insert(ht, new_buckets, (*current_bucket)->key, (*current_bucket)->value);
-    entry_destroy(*current_bucket);
+    entry_destroy(ht, *current_bucket);
     *current_bucket = next; // update current pointer to next entry_t
   }
 }
@@ -233,7 +238,7 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result)
     *link = current->next;
     *result = current->value;
 
-    entry_destroy(current);
+    entry_destroy(ht, current);
     (ht->ht_size)--;
     
     return true;

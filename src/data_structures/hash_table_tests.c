@@ -36,7 +36,7 @@ static bool string_compare(elem_t str1, elem_t str2){
 
 void test_create_destroy()
 {
-   ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+   ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
    CU_ASSERT_PTR_NOT_NULL(ht);
    ioopm_hash_table_destroy(ht);
@@ -45,7 +45,7 @@ void test_create_destroy()
 void test_update_key() // från instruktionerna
 {
   // create new hash table
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
   elem_t key;
   key.s = "abc";
@@ -76,7 +76,7 @@ void test_update_key() // från instruktionerna
 void test_insert_once() // från instruktionerna
 {
   // create new hash table
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
 
   elem_t key;
@@ -100,7 +100,7 @@ void test_insert_once() // från instruktionerna
 // This test case was written with assistance from ChatGPT.
 void test_remove_existing_key()
 {
-    ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+    ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
 
     elem_t key;
@@ -125,7 +125,7 @@ void test_remove_existing_key()
 // This test case was written with assistance from ChatGPT.
 void test_remove_nonexisting_key()
 {
-    ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+    ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
 
     elem_t key;
@@ -144,7 +144,7 @@ void test_remove_nonexisting_key()
 // This test case was written with assistance from ChatGPT.
 void test_remove_only_key()
 {
-    ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+    ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
 
     elem_t key;
@@ -169,7 +169,7 @@ void test_remove_only_key()
 // This test case was written with assistance from ChatGPT.
 void test_remove_from_collision_chain()
 {
-    ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+    ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
 
     /*
@@ -216,7 +216,7 @@ void test_remove_from_collision_chain()
 // This test case was written with assistance from ChatGPT.
 void test_remove_last_entry_in_collision_chain()
 {
-    ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+    ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
 
     elem_t key1 = string_elem("A*");
@@ -246,7 +246,7 @@ void test_remove_last_entry_in_collision_chain()
 // 1. Tom tabell ska inte ha nyckeln k
 //Gjorda av deepseek
 static void test_has_key_empty(void) {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
 
   CU_ASSERT_FALSE(ioopm_hash_table_has_key(ht, string_elem("A*")));
@@ -256,7 +256,7 @@ static void test_has_key_empty(void) {
 // 2. Efter insert av k ska k finnas, men inte k2
 //Gjorda av deepseek
 static void test_has_key_single(void) {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
   ioopm_hash_table_insert(ht, string_elem("k"), int_elem(1));
   CU_ASSERT_TRUE(ioopm_hash_table_has_key(ht, string_elem("k")));
@@ -268,7 +268,7 @@ static void test_has_key_single(void) {
 // 3. Efter insert av k1, k2, k3 ska alla finnas, men inte k4
 //Gjorda av deepseek
 static void test_has_key_multiple(void) {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
   ioopm_hash_table_insert(ht, string_elem("A*"), int_elem(1));
   ioopm_hash_table_insert(ht, string_elem("B-"), int_elem(2));
@@ -285,7 +285,7 @@ static void test_has_key_multiple(void) {
 // 4. Insert + remove av k => k ska inte finnas
 //Gjorda av deepseek
 static void test_remove_single(void) {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
   elem_t result = int_elem(0);
   ioopm_hash_table_insert(ht, string_elem("k"), int_elem(42));
@@ -299,7 +299,7 @@ static void test_remove_single(void) {
 // 5. Insert k1,k2,k3, remove k2 => k1,k3 finns, k2 inte
 //Gjorda av deepseek
 static void test_remove_middle(void) {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
   elem_t result = int_elem(0);
   ioopm_hash_table_insert(ht, string_elem("A*"), int_elem(1));
@@ -319,7 +319,7 @@ static void test_remove_middle(void) {
 // size of an empty hash table
 // gjort av deepseek
 static void test_size_empty(void) {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
   CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 0);
 
@@ -329,7 +329,7 @@ static void test_size_empty(void) {
 // size of a singleton hash table
 // gjort av deepseek
 static void test_size_singleton(void) {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
   ioopm_hash_table_insert(ht, string_elem("k"), int_elem(1));
   CU_ASSERT_EQUAL(ioopm_hash_table_size(ht), 1);
@@ -340,7 +340,7 @@ static void test_size_singleton(void) {
 // size of a larger hash table
 // gjort av deepseek
 static void test_size_larger(void) {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
   ioopm_hash_table_insert(ht, string_elem("k1"), int_elem(1));
   ioopm_hash_table_insert(ht, string_elem("k2"), int_elem(2));
@@ -355,7 +355,7 @@ static void test_size_larger(void) {
 // size after removing an element
 // gjort av deepseek
 static void test_size_after_remove(void) {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
   elem_t result = int_elem(0);
   

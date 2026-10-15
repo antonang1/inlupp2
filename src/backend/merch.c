@@ -1,9 +1,12 @@
 #include "merch.h"
+#include "stock.h"
 #include "../utils/utils.h"
 #include <stdlib.h>
 #include <string.h>
 #include "../data_structures/hash_table.h"
 #include "../data_structures/hash_table_iterator.h"
+#include "../data_structures/hash_table.h"
+#include "../data_structures/linked_list.h"
 
 
 // RULE:
@@ -24,8 +27,19 @@ int comparison_merch(elem_t a, elem_t b)
 }
 
 
-static void merch_destroy(merch_t *merch)
-{
+void merch_destroy(merch_t *merch)
+{    
+    if (merch == NULL)
+    {
+        free(merch);
+        return;
+    }
+
+    if (merch->shelfs != NULL)
+    {
+        ioopm_list_destroy(merch->shelfs);
+    }
+
     free(merch->name);
     free(merch->desc);
     free(merch);
@@ -33,20 +47,26 @@ static void merch_destroy(merch_t *merch)
     return;
 }
 
-merch_t *merch_create(char *name, char *desc, size_t price)
+merch_t *merch_create(const char *name, const char *desc, size_t price)
 {
     merch_t *new_merch = calloc(1, sizeof(merch_t));
 
-    new_merch->name = name;
-    new_merch->desc = desc;
+    new_merch->name = strdup(name);
+    new_merch->desc = strdup(desc);
     new_merch->price = price;
 
     return new_merch;
 }
 
+//borde vi ha const på alla sånna här funcs?
 // 2.1.1 Add Merchandise
 bool merch_add_to_store(store_t *store, char *name, char *desc, size_t price)
 {  
+    if (store == NULL)
+    {
+        return false;
+    }
+
     elem_t tmp;
     if (ioopm_hash_table_lookup(store->merchandise, string_elem(name), &tmp))
     {
@@ -61,16 +81,22 @@ bool merch_add_to_store(store_t *store, char *name, char *desc, size_t price)
 }
 
 // 2.1.3 Remove Merchandise
-bool merch_remove_from_store(store_t *store, merch_t *merch)
+bool merch_remove_from_store(store_t *store, char *merch_name)
 {
-    elem_t tmp;
-    if (!ioopm_hash_table_lookup(store->merchandise, string_elem(merch->name), &tmp))
+    elem_t merch_of_intrest;
+    if (!ioopm_hash_table_lookup(store->merchandise, string_elem(merch_name), &merch_of_intrest))
     {
         return false;
     }
 
-    ioopm_list_destroy(merch->shelfs);
-    merch_destroy(merch);
+    merch_t *merch = merch_of_intrest.p;
+
+    if (merch->shelfs != NULL)
+    {
+        stock_remove_merch(store, merch); // merch apperance in stock needs to be removed aswell
+    }
+
+    ioopm_hash_table_remove(store->merchandise, string_elem(merch_name), &merch_of_intrest);    // then we destroy the merch
 
     return true;
 }
@@ -95,7 +121,7 @@ bool merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, 
     // Otherwise we have to rehash!
     char *tmp = merch_of_intrest->name;
 
-    merch_of_intrest->name = new_name;
+    merch_of_intrest->name = new_name; //blir detta problem för att vi har strdup förut? måste vi frigöra name först?
     merch_of_intrest->desc = new_desc;
     merch_of_intrest->price = new_price;
 

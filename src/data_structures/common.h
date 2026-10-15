@@ -12,6 +12,11 @@ typedef struct hash_table ioopm_hash_table_t;
 typedef union element elem_t;
 typedef bool ioopm_eq_function(elem_t a, elem_t b);
 typedef size_t ioopm_hash_function(elem_t key);
+typedef void ioopm_elem_destroy_func(elem_t value); // LAGT TILL FÖR INLUPP 2, FÖR ATT KUNNA HANTERA ATT entry_t KAN VARA EN VOID-PEKARE
+// Function pointer used to destroy/free resources owned by an elem_t.
+// This is needed when list elements contain dynamically allocated data,
+// such as a pointer of type void stored in elem_t.
+
 
 union element {
   char *s;
@@ -35,4 +40,5 @@ struct hash_table
   size_t ht_size;               // holds the amount of entries for O(1) lookup
   ioopm_hash_function *hash;    // Function to hash the desired kind of key  
   ioopm_eq_function *is_equal;  // Function to check if the desired kind of key is equal to another
+  ioopm_elem_destroy_func *elem_destroy_fn;
 };

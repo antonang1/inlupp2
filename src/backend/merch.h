@@ -25,11 +25,14 @@ struct merch
 
 int comparison_merch(elem_t a, elem_t b);
 
-merch_t *merch_create(char *name, char *desc, size_t price);
+void merch_destroy(merch_t *value);
 
-bool merch_add_to_store(store_t *store, merch_t *merch);
+merch_t *merch_create(const char *name, const char *desc, size_t price);
 
-bool merch_remove_from_store(store_t *store, merch_t *merch);
+bool merch_add_to_store(store_t *store, char *name, char *desc, size_t price);
+
+bool merch_remove_from_store(store_t *store, char *merch_name);
 
 bool merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, size_t new_price);
 
+elem_t *list_merchandise(store_t *store, size_t *size_out);

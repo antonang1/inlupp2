@@ -29,3 +29,6 @@ struct store
     size_t next_cart_id;
 };
 
+void store_destroy(store_t *store);
+
+store_t *store_create(void);
