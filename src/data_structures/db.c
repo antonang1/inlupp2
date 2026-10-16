@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "utils.h"
+#include "../utils/utils.h"
 #include "linked_list.h"
 
 struct item {

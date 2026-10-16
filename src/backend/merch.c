@@ -8,6 +8,15 @@
 #include "../data_structures/hash_table.h"
 #include "../data_structures/linked_list.h"
 
+ioopm_list_t *merch_shelves(merch_t *merch)
+{
+    return merch->shelfs;
+}
+
+int merch_price(merch_t *merch)
+{
+    return merch->price;
+}
 
 // RULE:
 // negative outcome: a before b
@@ -25,7 +34,6 @@ int comparison_merch(elem_t a, elem_t b)
 
     return strcmp(merch_a->name, merch_b->name);
 }
-
 
 void merch_destroy(merch_t *merch)
 {    

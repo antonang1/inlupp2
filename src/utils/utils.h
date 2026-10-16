@@ -44,4 +44,7 @@ void print(char *string);
 
 void insertion_sort(elem_t *array, size_t length, comparison_func cmp);
 
+size_t ioopm_string_knr_hash(elem_t key);
+bool string_compare(elem_t str1, elem_t str2);
+
 #endif 

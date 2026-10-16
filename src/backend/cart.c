@@ -1,6 +1,7 @@
-#include "merch.h"
 #include "cart.h"
-#include "store.c"
+#include "merch.h"
+#include "stock.h"
+#include "store.h" 
 #include "../utils/utils.h"
 #include <stdlib.h>
 #include <string.h>
@@ -42,8 +43,6 @@ bool add_to_cart(store_t *store, size_t id, char *name, size_t quantity)
     {
         return false;
     }
-
-    merch_t *merch = merch_elem.p;
 
     // Box for the quantity already in the cart, and the amount to store
     elem_t quantity_elem;
@@ -98,7 +97,6 @@ bool remove_from_cart(store_t *store, size_t id, char *name, size_t quantity)
         return false;
     }
 
-    merch_t *merch = merch_elem.p;
 
     // The item must already be in this cart, or there is nothing to remove
     elem_t quantity_elem;
@@ -132,7 +130,42 @@ bool remove_from_cart(store_t *store, size_t id, char *name, size_t quantity)
 
 }
 
-int calculate_cost(store_t *store, size_t id, char *name, size_t quantitiy)
+int calculate_cost(store_t *store, size_t id)
 {
+    elem_t cart_elem;
+    if (!ioopm_hash_table_lookup(store->carts, int_elem(id), &cart_elem))
+    {
+        return 0;
+    }
 
+    cart_t *cart = cart_elem.p;
+
+    int total = 0;
+    
+    ioopm_hash_table_iterator_t *cart_iter = ioopm_hash_table_iterator_create(cart->items);
+
+    while (!ioopm_hash_table_iterator_at_end(cart_iter))
+    {  
+        elem_t key = ioopm_hash_table_iterator_current_key(cart_iter);
+        elem_t value = ioopm_hash_table_iterator_current_value(cart_iter);
+        elem_t result;
+
+        if (ioopm_hash_table_lookup(store_merchandise(store), key, &result))
+        {
+            merch_t *merch = result.p;
+            int price = merch_price(merch);
+            int amount = value.i;
+            total += price * amount;
+        }
+        ioopm_hash_table_iterator_advance(cart_iter);
+    }
+
+    ioopm_hash_table_iterator_destroy(cart_iter);
+    return total;
+ 
+}
+
+bool checkout(store_t *store, size_t id, char name, size_t quantity)
+{
+    
 }

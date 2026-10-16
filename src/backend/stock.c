@@ -1,12 +1,16 @@
 #include "stock.h"
 #include "merch.h"
+#include "store.h"
 #include "../utils/utils.h"
 #include <stdlib.h>
 #include <string.h>
 #include "../data_structures/hash_table.h"
 #include "../data_structures/hash_table_iterator.h"
+#include "../data_structures/list_iterator.h"
+#include "../data_structures/linked_list.h"
 #include <stdbool.h>
 #include <stdio.h>
+
 
 // RULE:
 // negative outcome: a before b
@@ -25,6 +29,9 @@ int comparison_shelf(elem_t a, elem_t b)
     return(strcmp(shelf_a->shelf_name, shelf_b->shelf_name));
 }
 
+// Allocates the struct and a copy of both strings (strdup).
+// The strings are copied, so the caller keeps nothing.
+// Free everything with shelf_destroy.
 shelf_t *shelf_create(const char *shelf, const char *merch_name)
 {
     shelf_t *new_shelf = calloc(1, sizeof(shelf_t));
@@ -109,20 +116,20 @@ bool stock_remove_merch(store_t *store, merch_t *merch_to_clear)
     return true;
 }
 
-/*
+
 // This function does not have ownership over the memeory allocated
 // ui.c does when calling this function!!! 
 elem_t *list_shelves(merch_t *merch, size_t *size_out)
 {
-    *size_out = ioopm_hash_table_size(merch->shelfs);
+    *size_out = ioopm_list_size(merch_shelves(merch));
     elem_t *shelves = calloc(*size_out, sizeof(elem_t));
 
-    ioopm_hash_table_iterator_t *iter = ioopm_list_iterator_create(merch->shelfs); 
+    ioopm_list_iterator_t *iter = ioopm_list_iterator_create(merch_shelves(merch));
     size_t i = 0;
 
     while (!ioopm_list_iterator_at_end(iter))
     {
-        shelves[i].i = ioopm_list_iterator_current(iter);
+        shelves[i] = ioopm_list_iterator_current(iter);
         i++;
         ioopm_list_iterator_advance(iter);
     }
@@ -132,4 +139,3 @@ elem_t *list_shelves(merch_t *merch, size_t *size_out)
 
     return shelves;
 }
-*/

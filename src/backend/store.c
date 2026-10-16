@@ -6,25 +6,18 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../data_structures/hash_table.h"
+#include "../utils/utils.h"
 
-static size_t ioopm_string_knr_hash(elem_t key)
+ioopm_hash_table_t *store_stock(store_t *store)
 {
-  const char *str = key.s;
-  size_t result = 0;
-  while (*str != '\0')
-  {
-    result = result * 31 + ((unsigned char) *str);
-    str++;
-  }
-  return result;
+    return store->stock;
 }
 
-static bool string_compare(elem_t str1, elem_t str2){
-  const char *string1 = str1.s;
-  const char *string2 = str2.s;
-
-  return strcmp(string1, string2) == 0;
+ioopm_hash_table_t *store_merchandise(store_t *store)
+{
+    return store->merchandise;
 }
+
 
 static void merch_destroy_callback(elem_t value)
 {
