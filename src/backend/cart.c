@@ -18,7 +18,7 @@ cart_t *cart_create(size_t id)
     }
 
     new_cart->id = id;
-    new_cart->items = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+    new_cart->items = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
     return new_cart;
 }
