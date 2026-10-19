@@ -7,6 +7,7 @@
 #include "../data_structures/hash_table_iterator.h"
 #include "../data_structures/hash_table.h"
 #include "../data_structures/linked_list.h"
+#include <stdio.h>
 
 ioopm_list_t *merch_shelves(merch_t *merch)
 {
@@ -114,11 +115,19 @@ bool merch_remove_from_store(store_t *store, char *merch_name)
 // TILL SENARE: KANSKE ÄNDRA SÅ ATT VI HAR IDS FÖR MAMN -> MERCH MAPPING I HT.
 bool merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, size_t new_price)
 {
+    if (new_name == NULL)
+    {
+        return false;
+    }
+
+    // check if old_name is a valid key to an entry (merch)
     elem_t result;
     if (!ioopm_hash_table_lookup(store->merchandise, string_elem(old_name), &result))
     {
         return false;
     }
+
+    // check if old and new name are not equal, and if new name already exists;
     if (strcmp(old_name, new_name) != 0 &&
         ioopm_hash_table_has_key(store->merchandise, string_elem(new_name)))
     {
@@ -126,19 +135,61 @@ bool merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, 
     }
 
     merch_t *merch_of_intrest = result.p;
-    // Otherwise we have to rehash!
-    char *tmp = merch_of_intrest->name;
-
-    merch_of_intrest->name = new_name; //blir detta problem för att vi har strdup förut? måste vi frigöra name först?
-    merch_of_intrest->desc = new_desc;
-    merch_of_intrest->price = new_price;
-
-    elem_t removed;
-    ioopm_hash_table_remove(store->merchandise, string_elem(tmp), &removed);
-    ioopm_hash_table_insert(store->merchandise, string_elem(merch_of_intrest->name), ptr_elem(merch_of_intrest));
-
-    return true;
     
+    // check if old and new name are equal, then we do a simpler procedure where only desc and price is updated.
+    // no need to update name, therefore no need to rehash the entry (merch)
+    if (strcmp(old_name, new_name) == 0)
+    {
+        free(merch_of_intrest->desc);
+        merch_of_intrest->desc = strdup(new_desc);
+        merch_of_intrest->price = new_price;
+        return true;
+    }
+
+    elem_t extracted_merch;
+    if (!ioopm_hash_table_extract(store->merchandise, string_elem(old_name), &extracted_merch))
+    {
+        return false;
+    }
+
+    merch_t *merch_update = extracted_merch.p;
+    free(merch_of_intrest->name);
+    free(merch_of_intrest->desc);
+    
+    merch_update->name = strdup(new_name);
+    merch_update->desc = strdup(new_desc);
+    
+    ioopm_hash_table_insert(store->merchandise, string_elem(merch_update->name), ptr_elem(merch_update));
+    
+    // if merch has locations, their info needs to be updated to new name aswell.
+    if (merch_update->shelfs != NULL)
+    {
+        stock_update_merch_name(merch_update);
+    }
+    
+    return true;    
+
+/*
+// Otherwise we have to rehash!
+
+// save potential locations of merch before removing and destroying
+ioopm_list_t *list_of_shelfs = merch_of_intrest->shelfs;
+
+// remove and destroy old version of merch, this effectivly saves removed value to "elem_t removed".
+elem_t removed;
+ioopm_hash_table_remove(store->merchandise, string_elem(merch_of_intrest->name), &removed);
+
+// create a new merch with updated info.
+merch_t *new_merch = merch_create(new_name, new_desc, new_price);
+
+// let the new merch get access to shelfs.
+new_merch->shelfs = list_of_shelfs;
+
+// insert updated merch to store.
+ioopm_hash_table_insert(store->merchandise, string_elem(new_name), ptr_elem(new_merch));
+*/
+
+
 }
 
 

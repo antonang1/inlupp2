@@ -239,6 +239,38 @@ void test_remove_mult_merch()
 }
 
 
+// --------------TESTS merch_edit--------------
+void test_edit_desc()
+{
+  store_t *store = store_create();
+  
+  // add merch to store:
+  char *merch_name1 = "TestItem";
+  char *merch_desc1 = "TestDesc";
+  size_t price1 = 1;
+  
+  bool added = merch_add_to_store(store, merch_name1, merch_desc1, price1);
+  CU_ASSERT_TRUE(added);
+  
+  replenish_stock(store, "A25", merch_name1, 8);
+  
+  bool edit = merch_edit(store, merch_name1, "TestItem2", "NewDesc", 1);
+  CU_ASSERT_TRUE(edit);
+
+  elem_t merch;
+  bool found = ioopm_hash_table_lookup(store->merchandise, string_elem("TestItem2"), &merch);
+  CU_ASSERT_TRUE(found);
+
+  merch_t *merch_of_intrest = merch.p;
+
+  CU_ASSERT_STRING_EQUAL(merch_of_intrest->desc, "NewDesc");
+
+  shelf_t *shelf = merch_of_intrest->shelfs->first->head.p;
+  CU_ASSERT_STRING_EQUAL(shelf->merch_name, "TestItem2");
+
+  store_destroy(store);
+}
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -266,6 +298,7 @@ int main() {
        || CU_add_test(my_test_suite, "Add and remove single merch w stock from store", test_remove__merch_w_stock) == NULL
        || CU_add_test(my_test_suite, "Removal of nonexisting merch should be invalid behaviour", test_remove_nonexisting_merch) == NULL
        || CU_add_test(my_test_suite, "Add and remove mult merch from store", test_remove_mult_merch) == NULL
+       || CU_add_test(my_test_suite, "Add and edit merch once", test_edit_desc) == NULL
      ) 
     {
       // If adding any of the tests fails, we tear down CUnit and exit

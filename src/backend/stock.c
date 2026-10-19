@@ -77,6 +77,7 @@ bool replenish_stock(store_t *store, char *shelf_name, char *merch_name, size_t 
     // the storage location does not exist in store->stock, therefore add shelf:
     shelf_t *new_shelf = shelf_create(shelf_name, merch_name);
     new_shelf->quantity = quantity;
+    
     ioopm_hash_table_insert(store->stock, string_elem(shelf_name), ptr_elem(new_shelf));
     
     // also add pointer to shelf in merch->shelfs
@@ -116,6 +117,21 @@ bool stock_remove_merch(store_t *store, merch_t *merch_to_clear)
     return true;
 }
 
+// ska denna kanske vara i merch.c?
+void stock_update_merch_name(merch_t *edited_merch)
+{
+    char *name_of_merch = edited_merch->name;
+    ioopm_list_t *shelfs_of_merch = edited_merch->shelfs;
+    ioopm_list_node_t *current = shelfs_of_merch->first;
+
+    // traverse list and change merch_name of each shelf_t
+    while (current != NULL)
+    {
+        shelf_t *current_shelf = current->head.p;
+        free(current_shelf->merch_name);
+        current_shelf->merch_name = name_of_merch;
+    }
+}
 
 // This function does not have ownership over the memeory allocated
 // ui.c does when calling this function!!! 

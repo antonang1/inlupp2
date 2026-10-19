@@ -44,6 +44,8 @@ bool replenish_stock(store_t *store, char *shelf_name, char *merch_name, size_t 
 
 bool stock_remove_merch(store_t *store, merch_t *merch_to_clear);
 
+void stock_update_merch_name(merch_t *edited_merch);
+
 /// @brief Returns all shelves holding a given item, sorted by shelf name.
 /// @param merch The item whose shelves to list.
 /// @param size_out Written with the number of shelves returned.

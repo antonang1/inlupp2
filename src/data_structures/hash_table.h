@@ -43,6 +43,8 @@ bool ioopm_hash_table_lookup(ioopm_hash_table_t *ht, elem_t key, elem_t *result)
 /// @return true/false depending on wether lookup was sucessfull
 bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result);
 
+bool ioopm_hash_table_extract(ioopm_hash_table_t *ht, elem_t key, elem_t *result);
+
 /// @brief Checks if the key exists in the given hashtable 
 /// @param ht Hashtable to check
 /// @param key key to check
