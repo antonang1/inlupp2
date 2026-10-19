@@ -25,15 +25,7 @@ int merch_price(merch_t *merch)
 // positive: a after b
 int comparison_merch(elem_t a, elem_t b)
 {
-    merch_t *merch_a = a.p;
-    merch_t *merch_b = b.p;
-
-    if (merch_a == NULL || merch_b == NULL) 
-    {
-        return 0;
-    }
-
-    return strcmp(merch_a->name, merch_b->name);
+    return strcmp(a.s, b.s);
 }
 
 void merch_destroy(merch_t *merch)
@@ -158,6 +150,7 @@ bool merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, 
     
     merch_update->name = strdup(new_name);
     merch_update->desc = strdup(new_desc);
+    merch_update->price = new_price;
     
     ioopm_hash_table_insert(store->merchandise, string_elem(merch_update->name), ptr_elem(merch_update));
     
@@ -167,29 +160,7 @@ bool merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, 
         stock_update_merch_name(merch_update);
     }
     
-    return true;    
-
-/*
-// Otherwise we have to rehash!
-
-// save potential locations of merch before removing and destroying
-ioopm_list_t *list_of_shelfs = merch_of_intrest->shelfs;
-
-// remove and destroy old version of merch, this effectivly saves removed value to "elem_t removed".
-elem_t removed;
-ioopm_hash_table_remove(store->merchandise, string_elem(merch_of_intrest->name), &removed);
-
-// create a new merch with updated info.
-merch_t *new_merch = merch_create(new_name, new_desc, new_price);
-
-// let the new merch get access to shelfs.
-new_merch->shelfs = list_of_shelfs;
-
-// insert updated merch to store.
-ioopm_hash_table_insert(store->merchandise, string_elem(new_name), ptr_elem(new_merch));
-*/
-
-
+    return true;
 }
 
 
@@ -205,7 +176,8 @@ elem_t *list_merchandise(store_t *store, size_t *size_out)
 
     while (!ioopm_hash_table_iterator_at_end(iter))
     {
-        merch[i] = ioopm_hash_table_iterator_current_value(iter);
+        merch_t *current_merch = ioopm_hash_table_iterator_current_value(iter).p;
+        merch[i] = string_elem(current_merch->name);
         i++;
         ioopm_hash_table_iterator_advance(iter);
     }

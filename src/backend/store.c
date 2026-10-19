@@ -1,5 +1,6 @@
 #include "store.h"
 #include "merch.h"
+#include "cart.h"
 #include "stock.h"
 #include <stdio.h>
 #include <stdbool.h>
@@ -53,6 +54,20 @@ static void shelf_destroy_callback(elem_t shelf_info)
   return;
 }
 
+static void cart_destroy_callback(elem_t value)
+{
+    cart_t *cart = value.p;
+
+    if (cart == NULL)
+    {
+        return;
+    }
+
+    ioopm_hash_table_destroy(cart->items);   
+    free(cart);                              
+}
+
+
 void store_destroy(store_t *store) {
   if (store == NULL)
   {
@@ -61,6 +76,7 @@ void store_destroy(store_t *store) {
 
   ioopm_hash_table_destroy(store->stock);
   ioopm_hash_table_destroy(store->merchandise);
+  ioopm_hash_table_destroy(store->carts);
 
   free(store);  
 
@@ -72,6 +88,14 @@ store_t *store_create(void) {
   // TODO: lägg till resten av ht's också.
   new_store->merchandise = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, merch_destroy_callback);
   new_store->stock = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, shelf_destroy_callback);
+  new_store->carts = ioopm_hash_table_create(ioopm_size_t_knr_hash, size_t_compare, cart_destroy_callback);
 
   return new_store;
+}
+
+int store_quit(store_t *store)
+{
+  store_destroy(store);
+  
+  return 1;
 }

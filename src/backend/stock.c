@@ -128,8 +128,11 @@ void stock_update_merch_name(merch_t *edited_merch)
     while (current != NULL)
     {
         shelf_t *current_shelf = current->head.p;
+
         free(current_shelf->merch_name);
-        current_shelf->merch_name = name_of_merch;
+        current_shelf->merch_name = strdup(name_of_merch);
+        
+        current = current->tail;
     }
 }
 

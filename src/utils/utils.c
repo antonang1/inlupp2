@@ -257,10 +257,20 @@ size_t ioopm_string_knr_hash(elem_t key)
   return result;
 }
 
+size_t ioopm_size_t_knr_hash(elem_t key)
+{
+    return key.i;
+}
+
 bool string_compare(elem_t str1, elem_t str2)
 {
   const char *string1 = str1.s;
   const char *string2 = str2.s;
 
   return strcmp(string1, string2) == 0;
+}
+
+bool size_t_compare(elem_t int1, elem_t int2)
+{
+    return int1.i == int2.i;
 }

@@ -27,3 +27,5 @@ bool add_to_cart(store_t *store, size_t id, char *name, size_t quantity);
 bool remove_cart(store_t *store, size_t id);
 
 bool remove_from_cart(store_t *store, size_t id, char *name, size_t quantity);
+
+int calculate_cost(store_t *store, size_t id);

@@ -2,6 +2,9 @@
 #include "../backend/merch.h"
 #include "../backend/store.h"
 #include "../backend/stock.h"
+#include "../data_structures/linked_list.h"
+#include "../data_structures/list_iterator.h"
+#include "../utils/utils.h"
 #include <stdbool.h>
 #include <stdlib.h>
 
@@ -271,6 +274,271 @@ void test_edit_desc()
   store_destroy(store);
 }
 
+void test_edit_desc_and_price()
+{
+    store_t *store = store_create();
+
+    CU_ASSERT_TRUE(
+        merch_add_to_store(store, "Apple", "Red apple", 10)
+    );
+
+    CU_ASSERT_TRUE(
+        merch_edit(store, "Apple", "Apple", "Green apple", 20)
+    );
+
+    elem_t result;
+    CU_ASSERT_TRUE(
+        ioopm_hash_table_lookup(
+            store->merchandise,
+            string_elem("Apple"),
+            &result
+        )
+    );
+
+    merch_t *merch = result.p;
+
+    CU_ASSERT_STRING_EQUAL(merch->name, "Apple");
+    CU_ASSERT_STRING_EQUAL(merch->desc, "Green apple");
+    CU_ASSERT_EQUAL(merch->price, 20);
+
+    store_destroy(store);
+}
+
+void test_edit_duplicate_name(void)
+{
+    store_t *store = store_create();
+
+    CU_ASSERT_TRUE(
+        merch_add_to_store(store, "Apple", "Red apple", 10)
+    );
+    CU_ASSERT_TRUE(
+        merch_add_to_store(store, "Pear", "Green pear", 15)
+    );
+
+    CU_ASSERT_FALSE(
+        merch_edit(store, "Apple", "Pear", "New description", 20)
+    );
+
+    elem_t result;
+    CU_ASSERT_TRUE(
+        ioopm_hash_table_lookup(
+            store->merchandise,
+            string_elem("Apple"),
+            &result
+        )
+    );
+
+    merch_t *apple = result.p;
+    CU_ASSERT_STRING_EQUAL(apple->name, "Apple");
+    CU_ASSERT_STRING_EQUAL(apple->desc, "Red apple");
+    CU_ASSERT_EQUAL(apple->price, 10);
+
+    CU_ASSERT_TRUE(
+        ioopm_hash_table_lookup(
+            store->merchandise,
+            string_elem("Pear"),
+            &result
+        )
+    );
+
+    merch_t *pear = result.p;
+    CU_ASSERT_STRING_EQUAL(pear->name, "Pear");
+    CU_ASSERT_EQUAL(pear->price, 15);
+
+    store_destroy(store);
+}
+
+
+void test_edit_name_with_multiple_shelves(void)
+{
+    store_t *store = store_create();
+
+    CU_ASSERT_TRUE(
+        merch_add_to_store(store, "Apple", "Red apple", 10)
+    );
+
+    CU_ASSERT_TRUE(replenish_stock(store, "A25", "Apple", 8));
+    CU_ASSERT_TRUE(replenish_stock(store, "B12", "Apple", 5));
+
+    CU_ASSERT_TRUE(
+        merch_edit(store, "Apple", "GreenApple",
+                   "Green apple", 12)
+    );
+
+    elem_t result;
+    CU_ASSERT_FALSE(
+        ioopm_hash_table_lookup(
+            store->merchandise,
+            string_elem("Apple"),
+            &result
+        )
+    );
+
+    CU_ASSERT_TRUE(
+        ioopm_hash_table_lookup(
+            store->merchandise,
+            string_elem("GreenApple"),
+            &result
+        )
+    );
+
+    merch_t *merch = result.p;
+
+    CU_ASSERT_STRING_EQUAL(merch->name, "GreenApple");
+    CU_ASSERT_STRING_EQUAL(merch->desc, "Green apple");
+    CU_ASSERT_EQUAL(merch->price, 12);
+    CU_ASSERT_EQUAL(ioopm_list_size(merch->shelfs), 2);
+
+    elem_t shelf_result;
+
+    CU_ASSERT_TRUE(
+        ioopm_hash_table_lookup(
+            store->stock,
+            string_elem("A25"),
+            &shelf_result
+        )
+    );
+    CU_ASSERT_STRING_EQUAL(
+        ((shelf_t *) shelf_result.p)->merch_name,
+        "GreenApple"
+    );
+
+    CU_ASSERT_TRUE(
+        ioopm_hash_table_lookup(
+            store->stock,
+            string_elem("B12"),
+            &shelf_result
+        )
+    );
+    CU_ASSERT_STRING_EQUAL(
+        ((shelf_t *) shelf_result.p)->merch_name,
+        "GreenApple"
+    );
+
+    store_destroy(store);
+}
+
+// --------------TESTS comparison_merch--------------
+void test_comparison_merch_equal(void)
+{
+    elem_t a = string_elem("Apple");
+    elem_t b = string_elem("Apple");
+
+    CU_ASSERT_EQUAL(comparison_merch(a, b), 0);
+}
+
+void test_comparison_merch_alphabetical_order(void)
+{
+    elem_t a = string_elem("Apple");
+    elem_t b = string_elem("Banana");
+
+    CU_ASSERT_TRUE(comparison_merch(a, b) < 0);
+    CU_ASSERT_TRUE(comparison_merch(b, a) > 0);
+}
+
+void test_comparison_merch_case_sensitive(void)
+{
+    elem_t lower = string_elem("apple");
+    elem_t upper = string_elem("Apple");
+
+    CU_ASSERT_NOT_EQUAL(comparison_merch(lower, upper), 0);
+}
+
+// -------------- TEST list_merchandise -------------
+
+void test_list_merchandise_sorted(void)
+{
+    store_t *store = store_create();
+
+    CU_ASSERT_TRUE(merch_add_to_store(store, "Pear", "Green pear", 15));
+    CU_ASSERT_TRUE(merch_add_to_store(store, "Apple", "Red apple", 10));
+    CU_ASSERT_TRUE(merch_add_to_store(store, "Banana", "Yellow banana", 5));
+
+    size_t size = 0;
+    elem_t *result = list_merchandise(store, &size);
+
+    CU_ASSERT_EQUAL(size, 3);
+
+    if (result != NULL && size == 3)
+    {
+        CU_ASSERT_STRING_EQUAL(result[0].s, "Apple");
+        CU_ASSERT_STRING_EQUAL(result[1].s, "Banana");
+        CU_ASSERT_STRING_EQUAL(result[2].s, "Pear");
+    }
+
+    free(result);
+    store_destroy(store);
+}
+
+
+void test_list_merchandise_empty(void)
+{
+    store_t *store = store_create();
+
+    size_t size = 99;
+    elem_t *result = list_merchandise(store, &size);
+
+    CU_ASSERT_EQUAL(size, 0);
+
+    free(result);
+    store_destroy(store);
+}
+
+
+void test_list_merchandise_single_item(void)
+{
+    store_t *store = store_create();
+
+    CU_ASSERT_TRUE(
+        merch_add_to_store(store, "Orange", "Fresh orange", 8)
+    );
+
+    size_t size = 0;
+    elem_t *result = list_merchandise(store, &size);
+
+    CU_ASSERT_EQUAL(size, 1);
+
+    if (result != NULL && size == 1)
+    {
+        CU_ASSERT_STRING_EQUAL(result[0].s, "Orange");
+    }
+
+    free(result);
+    store_destroy(store);
+}
+
+
+void test_list_merchandise_after_rename(void)
+{
+    store_t *store = store_create();
+
+    CU_ASSERT_TRUE(
+        merch_add_to_store(store, "Pear", "Green pear", 15)
+    );
+    CU_ASSERT_TRUE(
+        merch_add_to_store(store, "Banana", "Yellow banana", 5)
+    );
+
+    CU_ASSERT_TRUE(
+        merch_edit(store, "Pear", "Apple", "Red apple", 10)
+    );
+
+    size_t size = 0;
+    elem_t *result = list_merchandise(store, &size);
+
+    CU_ASSERT_EQUAL(size, 2);
+
+    if (result != NULL && size == 2)
+    {
+        CU_ASSERT_STRING_EQUAL(result[0].s, "Apple");
+        CU_ASSERT_STRING_EQUAL(result[1].s, "Banana");
+    }
+
+    free(result);
+    store_destroy(store);
+}
+
+
 int main() {
   // First we try to set up CUnit, and exit if we fail
   if (CU_initialize_registry() != CUE_SUCCESS)
@@ -299,6 +567,17 @@ int main() {
        || CU_add_test(my_test_suite, "Removal of nonexisting merch should be invalid behaviour", test_remove_nonexisting_merch) == NULL
        || CU_add_test(my_test_suite, "Add and remove mult merch from store", test_remove_mult_merch) == NULL
        || CU_add_test(my_test_suite, "Add and edit merch once", test_edit_desc) == NULL
+       || CU_add_test(my_test_suite, "Edit description and price", test_edit_desc_and_price) == NULL
+       || CU_add_test(my_test_suite, "Reject duplicate merchandise name", test_edit_duplicate_name) == NULL
+       || CU_add_test(my_test_suite, "Rename merchandise with multiple shelves", test_edit_name_with_multiple_shelves) == NULL
+       || CU_add_test(my_test_suite, "Comparison: equal", test_comparison_merch_equal) == NULL
+       || CU_add_test(my_test_suite, "Comparison: alphabetical order", test_comparison_merch_alphabetical_order) == NULL
+       || CU_add_test(my_test_suite, "Comparison: case sensitivity", test_comparison_merch_case_sensitive) == NULL
+       || CU_add_test(my_test_suite, "List merchandise: sorted", test_list_merchandise_sorted) == NULL
+       || CU_add_test(my_test_suite, "List merchandise: empty", test_list_merchandise_empty) == NULL
+       || CU_add_test(my_test_suite, "List merchandise: single item", test_list_merchandise_single_item) == NULL
+       || CU_add_test(my_test_suite, "List merchandise: after rename", test_list_merchandise_after_rename) == NULL
+       
      ) 
     {
       // If adding any of the tests fails, we tear down CUnit and exit

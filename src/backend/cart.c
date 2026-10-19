@@ -24,6 +24,7 @@ cart_t *cart_create(size_t id)
 }
 
 
+
 // NOTE TO SELF: cart's quantity is what the costumer plans to buy
 // The stock is what the warehouse/store holds. 
 bool add_to_cart(store_t *store, size_t id, char *name, size_t quantity)
@@ -73,10 +74,6 @@ bool remove_cart(store_t *store, size_t id)
 
     ioopm_hash_table_remove(store->carts, int_elem(id), &cart_elem);
 
-    cart_t *cart = cart_elem.p;
-    ioopm_hash_table_destroy(cart->items);   // the cart owns this table
-    free(cart);                              // and the cart struct itself
-
     return true;
 }
 
@@ -122,7 +119,7 @@ bool remove_from_cart(store_t *store, size_t id, char *name, size_t quantity)
     }
     else
     {
-        // maybe not insert once again 
+        // Updates the quantity in place if the item already exists in the cart
         ioopm_hash_table_insert(cart->items, string_elem(name), int_elem(remaining));
     }
 
@@ -145,7 +142,7 @@ int calculate_cost(store_t *store, size_t id)
     ioopm_hash_table_iterator_t *cart_iter = ioopm_hash_table_iterator_create(cart->items);
 
     while (!ioopm_hash_table_iterator_at_end(cart_iter))
-    {  
+    {
         elem_t key = ioopm_hash_table_iterator_current_key(cart_iter);
         elem_t value = ioopm_hash_table_iterator_current_value(cart_iter);
         elem_t result;
@@ -157,15 +154,142 @@ int calculate_cost(store_t *store, size_t id)
             int amount = value.i;
             total += price * amount;
         }
-        ioopm_hash_table_iterator_advance(cart_iter);
-    }
 
+        ioopm_hash_table_iterator_advance(cart_iter);   
+
+    }
     ioopm_hash_table_iterator_destroy(cart_iter);
     return total;
- 
+
 }
 
-bool checkout(store_t *store, size_t id, char name, size_t quantity)
+bool stock_decrease_merch(store_t *store, ioopm_hash_table_t *items_of_cart)
 {
+    ioopm_hash_table_iterator_t *iter = ioopm_hash_table_iterator_create(items_of_cart);
+
+    while (!ioopm_hash_table_iterator_at_end(iter))
+    {
+        elem_t current_key = ioopm_hash_table_iterator_current_key(iter);
+        elem_t current_value = ioopm_hash_table_iterator_current_value(iter);
+        
+        elem_t merch;
+        ioopm_hash_table_lookup(store->merchandise, current_key, &merch);
+        
+        merch_t *current_merch = merch.p;
+        ioopm_list_t *shelfs = current_merch->shelfs;
+        ioopm_list_node_t *current_node = shelfs->first;
+
+        while (current_node != NULL)
+        {
+            shelf_t *current_shelf = current_node->head.p;
+            int difference = current_shelf->quantity - current_value.i;
+
+            if (difference == 0)
+            {
+                stock_edit_quantity()
+                stock_remove_shelf()
+            }
+
+            if (difference < 0)
+            {
+                stock_remove_shelf()
+                int remaining = abs(difference);
+                
+            }
+
+            if (difference > 0)
+            {
+                
+            }
+
+        }
+    }
+}
+
+bool check_if_all_items_valid(store_t *store, size_t id, ioopm_hash_table_t *items_of_cart, int *status)
+{
+    //traverse items of cart
+    ioopm_hash_table_iterator_t *iter = ioopm_hash_table_iterator_create(items_of_cart);
+
+    while (!ioopm_hash_table_iterator_at_end(iter))
+    {
+        elem_t current_key = ioopm_hash_table_iterator_current_key(iter);
+        elem_t current_value = ioopm_hash_table_iterator_current_value(iter);
+
+        if (!ioopm_hash_table_has_key(store->merchandise, current_key))
+        {
+            remove_from_cart(store, id, current_key.s, (size_t) current_value.i);
+
+            status = -2; //-2 indicates that merch in cart does not exist in store anymore!
+            return false; 
+        }
+
+        elem_t merch;
+        ioopm_hash_table_lookup(store->merchandise, current_key, &merch);
+        
+        merch_t *current_merch = merch.p;
+        ioopm_list_t *shelfs = current_merch->shelfs;
+        ioopm_list_node_t *current_node = shelfs->first;
+
+        size_t total_stock = 0;
+
+        while (current_node != NULL)
+        {
+            shelf_t *current_shelf = current_node->head.p;
+
+            total_stock += current_shelf->quantity;
+
+            current_node = current_node->tail;
+        }
+
+        if (int_value(current_value) > (int) total_stock)
+        {
+            remove_from_cart(store, id, current_key.s, (size_t) current_value.i);
+            
+            status = -3; // -3 indicates that the user tries to buy more items than allowed.
+            return false; 
+        }
+        
+        ioopm_hash_table_iterator_advance(iter);
+    }
+
+    ioopm_hash_table_iterator_destroy(iter);
+
+    status = 0;
+    return true;
+
+}
+
+int checkout(store_t *store, size_t id)
+{
+    elem_t cart_elem;
+    if (!ioopm_hash_table_lookup(store->carts, int_elem(id), &cart_elem))
+    {
+        return -1; // -1 indicates that cart does not exist. 
+    }
     
+    // Decrease the stock for the merches in the cart.
+    
+
+    ioopm_hash_table_t *items_of_cart = cart_elem.p;
+
+    if (items_of_cart == NULL)
+    {
+        remove_cart(store, id);
+        return 0;
+    }
+
+    int status;
+    if (!check_if_all_items_valid(store, id, items_of_cart, &status))
+    {
+        return status;
+    }
+    
+    stock_decrease_merch(store, items_of_cart);
+
+    int total = calculate_cost(store, id);
+
+    remove_cart(store, id);
+    return total;
+
 }

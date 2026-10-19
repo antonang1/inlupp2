@@ -245,7 +245,7 @@ bool ioopm_hash_table_remove(ioopm_hash_table_t *ht, elem_t key, elem_t *result)
   }
 }
 
-// almost the same as ioopm_hash_table_remove, but it does not destroy the entry, only extracts it!
+// almost the same as ioopm_hash_table_remove, destroys the link between current and value, but not the value, only extracts it!
 bool ioopm_hash_table_extract(ioopm_hash_table_t *ht, elem_t key, elem_t *result)
 {
   entry_t **link = find_entry_link(ht, key);
@@ -258,6 +258,8 @@ bool ioopm_hash_table_extract(ioopm_hash_table_t *ht, elem_t key, elem_t *result
     *result = current->value;
     
     (ht->ht_size)--;
+
+    free(current);
 
     return true;
   }
