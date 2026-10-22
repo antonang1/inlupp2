@@ -39,9 +39,6 @@ char *ask_question_string(char *question);
 bool is_shelf(char *str);
 char *ask_question_shelf(char*question);
 
-void println(char *string);
-void print(char *string);
-
 void insertion_sort(elem_t *array, size_t length, comparison_func cmp);
 
 size_t ioopm_string_knr_hash(elem_t key);

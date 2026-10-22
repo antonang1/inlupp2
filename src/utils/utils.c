@@ -15,9 +15,6 @@ typedef bool check_func(char *);
 
 typedef answer_t convert_func(char *);
 
-
-
-
 void clear_input_buffer() {
     int c;
     do {
@@ -213,20 +210,7 @@ char *ask_question_shelf(char*question) {
     return ask_question(question, is_shelf, (convert_func *) strdup).string_value;
 }
 
-// print funcs
-void print(char *string) {
 
-    // traverse string with pointer of string, increment pointer each iteration
-    while (*string != '\0') {
-        putchar(*string);
-        string++;
-    }
-}
-
-void println(char *string) {
-    print(string);
-    print("\n");
-}
 
 void insertion_sort(elem_t *array, size_t length, comparison_func cmp)
 {

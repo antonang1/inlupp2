@@ -30,15 +30,22 @@ void ioopm_list_iterator_destroy(ioopm_list_iterator_t *iter)
 
 bool ioopm_list_iterator_at_end(ioopm_list_iterator_t *iter)
 {
-    return iter->current_node->tail == NULL;
+    return iter->current_node == NULL;
 }
 
 void ioopm_list_iterator_advance(ioopm_list_iterator_t *iter)
 {
+    if (ioopm_list_iterator_at_end(iter))
+    {
+        return;
+    }
+    iter->current_node = iter->current_node->tail;
     //Går vidare till nästa element om det finns, annars loopa runt till början igen
+    /*
     iter->current_node = ioopm_list_iterator_at_end(iter)
                              ? iter->list->first
                              : iter->current_node->tail;
+    */
 }
 
 elem_t ioopm_list_iterator_current(ioopm_list_iterator_t *iter)

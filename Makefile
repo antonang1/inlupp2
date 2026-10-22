@@ -27,8 +27,24 @@ test_cart: compile_cart
 	src/tests/test_cart
 	valgrind --leak-check=full src/tests/test_cart
 
-# --- Run both suites ---
-test: test_merch test_cart
+# --- Stock tests ---
+compile_stock: $(SRC) src/tests/test_stock.c
+	gcc $(CFLAGS) $(SRC) src/tests/test_stock.c -o src/tests/test_stock -lcunit
+
+test_stock: compile_stock
+	src/tests/test_stock
+	valgrind --leak-check=full src/tests/test_stock
+
+# --- Store tests ---
+compile_store: $(SRC) src/tests/test_store.c
+	gcc $(CFLAGS) $(SRC) src/tests/test_store.c -o src/tests/test_store -lcunit
+
+test_store: compile_store
+	src/tests/test_store
+	valgrind --leak-check=full src/tests/test_store
+
+# --- Run all suites ---
+test: test_merch test_cart test_stock test_store
 
 clean:
 	find . \( -name "*.gcno" -o -name "*.gcda" -o -name "*.gcov" \) -delete

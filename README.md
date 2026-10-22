@@ -13,3 +13,14 @@ Separation of concerns means keeping the different responsibilities a program ha
 Keeping the price lookup in merch_price instead of reading merch->price directly in calculate_cost separates the job of knowing how a merch stores its price from the job of adding up a cart, so the two can change independently.
 
 // backend -> merch.c -> cart.c -> calculate_cost
+
+
+
+- hur man kör programmet via readmefilen
+- design:
+    - ändrade hashtabellens struct - la in destroy funktion
+    - la in för listor men inget vi använde
+    - moduler
+    - i user input tog vi inspiration från databasuppgifter
+    - ändrade remove ioopm_hashtable
+    - 

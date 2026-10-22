@@ -29,3 +29,9 @@ bool remove_cart(store_t *store, size_t id);
 bool remove_from_cart(store_t *store, size_t id, char *name, size_t quantity);
 
 int calculate_cost(store_t *store, size_t id);
+
+void stock_decrease_merch(store_t *store, ioopm_hash_table_t *items_of_cart); 
+
+bool check_if_all_items_valid(store_t *store, size_t id, ioopm_hash_table_t *items_of_cart, int *status);
+
+int checkout(store_t *store, size_t id); 

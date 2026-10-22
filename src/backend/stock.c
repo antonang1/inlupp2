@@ -18,6 +18,8 @@
 // positive: a after b
 int comparison_shelf(elem_t a, elem_t b)
 {
+    return strcmp(a.s, b.s);
+    /*
     shelf_t *shelf_a = a.p;
     shelf_t *shelf_b = b.p;
 
@@ -25,8 +27,9 @@ int comparison_shelf(elem_t a, elem_t b)
     {
         return 0;
     }
-
     return(strcmp(shelf_a->shelf_name, shelf_b->shelf_name));
+    */
+
 }
 
 // Allocates the struct and a copy of both strings (strdup).
@@ -142,16 +145,17 @@ elem_t *list_shelves(merch_t *merch, size_t *size_out)
 {
     *size_out = ioopm_list_size(merch_shelves(merch));
     elem_t *shelves = calloc(*size_out, sizeof(elem_t));
-
+    
     ioopm_list_iterator_t *iter = ioopm_list_iterator_create(merch_shelves(merch));
     size_t i = 0;
-
     while (!ioopm_list_iterator_at_end(iter))
     {
-        shelves[i] = ioopm_list_iterator_current(iter);
+        shelf_t *current_shelf = ioopm_list_iterator_current(iter).p;
+        shelves[i] = string_elem(current_shelf->shelf_name);
         i++;
         ioopm_list_iterator_advance(iter);
     }
+    
 
     ioopm_list_iterator_destroy(iter);
     insertion_sort(shelves, *size_out, comparison_shelf);

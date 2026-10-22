@@ -250,6 +250,94 @@ void test_calculate_cost()
     store_destroy(store);
 }
 
+// -------------- TESTS checkout helpers --------------
+
+// calculate_cost: no cart means 0, not a crash
+void test_calculate_cost_no_cart(void)
+{
+    store_t *store = store_create();
+
+    CU_ASSERT_EQUAL(calculate_cost(store, 99), 0);
+
+    store_destroy(store);
+}
+
+// calculate_cost: empty cart means 0
+void test_calculate_cost_empty_cart(void)
+{
+    store_t *store = store_create();
+    
+    cart_t *cart = cart_create(1);
+    ioopm_hash_table_insert(store->carts, int_elem(1), ptr_elem(cart));
+    
+    CU_ASSERT_EQUAL(calculate_cost(store, 1), 0);
+    
+    store_destroy(store);
+}
+
+// check_if_all_items_valid: empty cart is valid and sets status to 0
+void test_check_valid_empty_cart(void)
+{
+    store_t *store = store_create();
+    
+    cart_t *cart = cart_create(1);
+    ioopm_hash_table_insert(store->carts, int_elem(1), ptr_elem(cart));
+    
+    int status = 99;
+    bool valid = check_if_all_items_valid(store, 1, cart->items, &status);
+    
+    CU_ASSERT_TRUE(valid);
+    CU_ASSERT_EQUAL(status, 0);
+    
+    store_destroy(store);
+}
+
+// stock_decrease_merch: buying a shelf empty removes it from stock and from the merch list
+void test_stock_decrease_removes_shelf(void)
+{
+    store_t *store = store_create();
+    
+    merch_add_to_store(store, "Apple", "Red apple", 5);
+    replenish_stock(store, "A10", "Apple", 3);
+    
+    cart_t *cart = cart_create(1);
+    ioopm_hash_table_insert(store->carts, int_elem(1), ptr_elem(cart));
+    add_to_cart(store, 1, "Apple", 3);
+    
+    elem_t merch_result;
+    ioopm_hash_table_lookup(store->merchandise, string_elem("Apple"), &merch_result);
+    merch_t *merch = merch_result.p;
+    
+    stock_decrease_merch(store, cart->items);
+    elem_t value;
+    CU_ASSERT_FALSE(ioopm_hash_table_lookup(store->stock, string_elem("A10"), &value));
+    CU_ASSERT_EQUAL(ioopm_list_size(merch->shelfs), 0);
+    
+    store_destroy(store);
+}
+
+// checkout: exactly all the stock is a success and empties the shelf
+void test_checkout_exact_stock(void)
+{
+    store_t *store = store_create();
+    
+    merch_add_to_store(store, "Apple", "Red apple", 5);
+    replenish_stock(store, "A10", "Apple", 3);
+    
+    cart_t *cart = cart_create(1);
+    ioopm_hash_table_insert(store->carts, int_elem(1), ptr_elem(cart));
+    add_to_cart(store, 1, "Apple", 3);
+    
+    int result = checkout(store, 1);
+    CU_ASSERT_EQUAL(result, 15);
+    
+    elem_t value;
+    CU_ASSERT_FALSE(ioopm_hash_table_lookup(store->stock, string_elem("A10"), &value));
+    CU_ASSERT_FALSE(ioopm_hash_table_lookup(store->carts, int_elem(1), &value));
+    
+    store_destroy(store);
+}
+
 int main() {
   if (CU_initialize_registry() != CUE_SUCCESS)
     return CU_get_error();
@@ -273,6 +361,11 @@ int main() {
        || CU_add_test(my_test_suite, "Remove item not in cart should be invalid", test_remove_item_not_in_cart) == NULL
        || CU_add_test(my_test_suite, "Remove a whole cart", test_remove_cart) == NULL
        || CU_add_test(my_test_suite, "Calculate total cost of a cart", test_calculate_cost) == NULL
+       || CU_add_test(my_test_suite, "Calculate cost of nonexisting cart", test_calculate_cost_no_cart) == NULL
+       || CU_add_test(my_test_suite, "Calculate cost of empty cart", test_calculate_cost_empty_cart) == NULL
+       || CU_add_test(my_test_suite, "Empty cart is valid", test_check_valid_empty_cart) == NULL
+       || CU_add_test(my_test_suite, "Decrease stock removes emptied shelf", test_stock_decrease_removes_shelf) == NULL
+       || CU_add_test(my_test_suite, "Checkout of exact stock empties shelf", test_checkout_exact_stock) == NULL
      )
     {
       CU_cleanup_registry();
