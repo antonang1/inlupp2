@@ -1,10 +1,12 @@
-#pragma once
-#include "data_structures/db.c"
-#include "utils.h"
-#include "backend/merch.h"
-#include "backend/cart.h"
-#include "backend/stock.h"
+
+#include "ui.h"
+#include "../utils/utils.h"
+#include "../backend/merch.h"
+#include "../backend/cart.h"
+#include "../backend/stock.h"
 #include "../backend/store.h"
+#include <stdio.h>
+#include <ctype.h>
 
 
 // ui_add_merch(db) : A
@@ -37,7 +39,7 @@ bool is_valid_menu_choice(char *str) {
     return valid;
 }
 
-answer_t convert_menu(char *str) {
+answer_t convert_to_upper(char *str) {
     answer_t answer;
     answer.int_value = toupper(str[0]);
 
@@ -45,17 +47,35 @@ answer_t convert_menu(char *str) {
 }
 
 char ask_question_menu(char *question) {
-    return ask_question(question, is_valid_menu_choice, convert_menu).int_value;
+    return ask_question(question, is_valid_menu_choice, convert_to_upper).int_value;
 }
 
-bool check_confirmation(char *str)
+bool confirmation_starts_with(char *str, char expected)
 {
-    return (strcmp(str[0], "y") == 0 || strcmp(str[0], "Y") == 0);
+    if (str == NULL || str[0] == '\0')
+    {
+        return false;
+    }
+
+    return toupper((unsigned char) str[0]) == expected;
+}
+
+bool confirmation_procedure(char *question, char expected, char *str_to_print_if_confrimed)
+{
+    char *confirmation = ask_question_string(question);
+
+    if (confirmation_starts_with(confirmation, expected))
+    {
+        printf("%s", str_to_print_if_confrimed);
+        return true;
+    }
+    
+    return false;
 }
 
 char *print_menu(void) {
     // Added option [d], felt like it was missing
-    char *menu = ("|--- MENU ---|"
+    char *menu = ("\n\n   |----- MENU -----|\n"
                   "-> [A]dd merchandise\n"
                   "-> [L]ist merchandise\n"
                   "-> [D]elete merchandise\n"
@@ -68,19 +88,9 @@ char *print_menu(void) {
                   "-> Remove from cart: [-]\n"
                   "-> Calculate cost: [=]\n"
                   "-> Check[o]ut\n"
-                  "-> [Q]uit\n");
+                  "-> [Q]uit\n\n");
     
     return menu;
-}
-
-
-void ui_add_merch(store_t *store)
-{
-    char *merch_name = ask_question_string("Name of new merch: ");
-    char *merch_desc = ask_question_string("Description of merch: ");
-    size_t *merch_price = abs(ask_question_int("Price of merch: "));
-
-    merch_add_to_store(store, merch_name, merch_desc, merch_price);
 }
 
 void print_merch(char *string)
@@ -88,21 +98,33 @@ void print_merch(char *string)
     printf("Name: %s\n", string);
 }
 
+void ui_add_merch(store_t *store)
+{
+    printf("-----ADD MERCH TO STORE-----\n");
+    char *merch_name = ask_question_string("Name of new merch: ");
+    char *merch_desc = ask_question_string("Description of merch: ");
+    size_t merch_price = (size_t) ask_question_int("Price of merch: ", is_positive_number);
+
+    merch_add_to_store(store, merch_name, merch_desc, merch_price);
+
+}
+
 void ui_list_merchandise(store_t *store)
 {
+    printf("-----LIST MERCHANDISE-----\n");
     size_t size = 0;
     elem_t *array_of_merch = list_merchandise(store, &size);
 
-    for (size_t i = 0; i <= size; i++)
+    for (size_t i = 0; i < size; i++)
     {
-        if (i % 20 == 0)
+        if (i != 0 && i % 2 == 0)
         {
-            char *keep_printing = ask_question_string("Do you want to keep printing merchandise? [Y/N]");
-            if (!check_confirmation(keep_printing))
+            if (confirmation_procedure("Do you want to keep printing merchandise? [Y/N]: ", 'N', "RETURNING TO MENU\n"))
             {
                 break;
             }
         }
+
         print_merch(array_of_merch[i].s);
     }
     
@@ -110,25 +132,86 @@ void ui_list_merchandise(store_t *store)
 }
 
 void ui_remove_merchandise(store_t *store)
-{
-    char *merch_of_intrest = ask_question_string("Name of merch to remove from store: ");
-    
-    char *confirmation = ask_question_string("Are you sure that you want to remove this merch from store? [Y/N]");
-    if (!check_confirmation(confirmation))
-    {
-        printf("Removal not executed\n");
-        return;
-    }
+{   
+    printf("-----REMOVE MERCH-----\n");
 
-    merch_remove_from_store(store, merch_of_intrest);
-    printf("The following merch has been removed from store: %s\n", merch_of_intrest);
-    return; 
+    bool done = false;
+
+    do {
+        char *merch_of_intrest = ask_question_string("Name of merch to remove from store: ");
+        
+        if (!confirmation_procedure("Are you sure that you want to remove this merch from store? [Y/N]: ", 'Y', "REMOVING MERCH FROM STORE\n"))
+        {
+            printf("Removal not executed\nRETURNING TO STORE\n");
+            return;
+        }
+    
+        bool remove_success = merch_remove_from_store(store, merch_of_intrest);
+        if (remove_success)
+        {
+            printf("The following merch has been removed from store: '%s'\n", merch_of_intrest);
+            done = true;
+        }
+        else
+        {
+            printf("FAILED TO REMOVE: merch not found\n");
+
+            if (confirmation_procedure("Do you wish to try again? [Y/N]: ", 'N', "RETURNING TO MENU\n"))
+            {
+                done = true;
+            }
+        } 
+
+    } while (done == false);
+
+    return;
+}
+
+void ui_edit_merch(store_t *store)
+{
+    printf("-----EDIT MERCH-----\n");
+
+    bool done = false;
+
+    do
+    {
+        char *merch_to_edit = ask_question_string("Name of merch to edit: ");
+        
+        char *new_name = ask_question_string("New name: ");
+        char *new_desc = ask_question_string("New description: ");
+        int new_price = ask_question_int("New price (positive integer): ", is_positive_number);
+        
+        if (!confirmation_procedure("Do you wish to complete the edit? [Y/N]: ", 'Y', "COMPLETING EDIT\n"))
+        {
+            printf("Edit not completed\nRETURNING TO MENU\n");
+            return;
+        }
+
+        bool edit_success = merch_edit(store, merch_to_edit, new_name, new_desc, (size_t) new_price);
+        if (edit_success)
+        {
+            printf("Edit completed: '%s' is now '%s'", merch_to_edit, new_name);
+            done = true;
+        }
+        else
+        {
+            printf("FAILED TO EDIT: Name of merch to edit was invalid or new name is already taken.\n");
+            
+            if (confirmation_procedure("Do you wish to try again? [Y/N]: ", 'N', "RETURNING TO MENU\n"))
+            {
+                done = true;
+            }
+        }
+
+    } while (done == false);
+
+    return;
 }
 
 int event_loop(store_t *store) {
     bool run = true;
     char user_choice;
-
+    
     while (run) {
         user_choice = ask_question_menu(print_menu());
         if (user_choice == 'A')
@@ -145,8 +228,9 @@ int event_loop(store_t *store) {
         }
         else if (user_choice == 'E')
         {
-            
+            ui_edit_merch(store);   
         } 
+        /*
         else if (user_choice == 'S')
         {
             
@@ -175,10 +259,11 @@ int event_loop(store_t *store) {
         {
             
         } 
-        else if (user_choice == 'O') 
-        {
-            
-        } 
+         else if (user_choice == 'O') 
+         {
+             
+         } 
+        */
         else if (user_choice == 'Q') 
         {
             run = false;

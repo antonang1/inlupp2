@@ -25,3 +25,5 @@ ioopm_hash_table_t *store_merchandise(store_t *store);
 void store_destroy(store_t *store);
 
 store_t *store_create(void);
+
+int store_quit(store_t *store);

@@ -27,7 +27,8 @@ char *trim(char *str);
 answer_t ask_question(char *question, check_func *check, convert_func *convert);
 
 bool is_number(char *str);
-int ask_question_int(char *question);
+bool is_positive_number(char *str);
+int ask_question_int(char *question, check_func *check);
 
 answer_t make_float(char *str);
 bool is_float(char *str);

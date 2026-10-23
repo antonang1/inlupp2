@@ -123,8 +123,32 @@ bool is_number(char *str) {
     return true;
 }
 
-int ask_question_int(char *question) {
-    return ask_question(question, is_number, (convert_func *) atoi).int_value;
+bool is_positive_number(char *str) {
+    int str_len = strlen(str);
+    int index = 0;
+
+    //check if valid str
+    if (str_len == 0) {
+        return false;
+    }
+    
+    // check if negative
+    if (str[index] == '-') {
+        return false;
+    }
+    
+    // traverse str
+    for (; index < str_len; index++) {
+        if (!isdigit(str[index])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+int ask_question_int(char *question, check_func *check) {
+    return ask_question(question, check, (convert_func *) atoi).int_value;
 }
 
 

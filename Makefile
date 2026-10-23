@@ -9,7 +9,9 @@ SRC = src/data_structures/hash_table.c \
       src/backend/store.c \
       src/backend/stock.c \
       src/backend/merch.c \
-      src/backend/cart.c
+      src/backend/cart.c \
+	  src/ui/ui.c \
+	  main.c
 
 # --- Merch tests ---
 compile_merch: $(SRC) src/tests/test_merch.c
@@ -45,6 +47,9 @@ test_store: compile_store
 
 # --- Run all suites ---
 test: test_merch test_cart test_stock test_store
+
+compile_main: $(SRC)
+	gcc $(CFLAGS) $(SRC) -o main
 
 clean:
 	find . \( -name "*.gcno" -o -name "*.gcda" -o -name "*.gcov" \) -delete
