@@ -18,27 +18,5 @@
 // ui_undo(db) : U
 // ui_quit() : Q
 
-bool is_valid_menu_choice(char *str);
-
-answer_t convert_to_upper(char *str);
-
-char ask_question_menu(char *question);
-
-bool confirmation_starts_with(char *str, char expected);
-
-bool confirmation_procedure(char *question, char expected, char *str_to_print_if_confrimed);
-
-char *print_menu(void);
-
-void print_merch(char *string);
-
-void ui_add_merch(store_t *store);
-
-void ui_list_merchandise(store_t *store);
-
-void ui_remove_merchandise(store_t *store);
-
-void ui_edit_merch(store_t *store);
-
 
 int event_loop(store_t *store);

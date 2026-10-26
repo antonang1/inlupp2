@@ -133,7 +133,7 @@ bool is_positive_number(char *str) {
     }
     
     // check if negative
-    if (str[index] == '-') {
+    if (str[index] == '-' || str[index] == '0') {
         return false;
     }
     

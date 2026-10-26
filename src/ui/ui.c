@@ -26,7 +26,7 @@
 // MENU
 // Needed because toupper() takes an int as arg but a convert_func expects a char * as arg
 
-bool is_valid_menu_choice(char *str) {
+static bool is_valid_menu_choice(char *str) {
     int str_len = strlen(str);
 
     //check if valid str
@@ -39,18 +39,18 @@ bool is_valid_menu_choice(char *str) {
     return valid;
 }
 
-answer_t convert_to_upper(char *str) {
+static answer_t convert_to_upper(char *str) {
     answer_t answer;
     answer.int_value = toupper(str[0]);
 
     return answer;
 }
 
-char ask_question_menu(char *question) {
+static char ask_question_menu(char *question) {
     return ask_question(question, is_valid_menu_choice, convert_to_upper).int_value;
 }
 
-bool confirmation_starts_with(char *str, char expected)
+static bool confirmation_starts_with(char *str, char expected)
 {
     if (str == NULL || str[0] == '\0')
     {
@@ -60,7 +60,7 @@ bool confirmation_starts_with(char *str, char expected)
     return toupper((unsigned char) str[0]) == expected;
 }
 
-bool confirmation_procedure(char *question, char expected, char *str_to_print_if_confrimed)
+static bool confirmation_procedure(char *question, char expected, char *str_to_print_if_confrimed)
 {
     char *confirmation = ask_question_string(question);
 
@@ -73,7 +73,7 @@ bool confirmation_procedure(char *question, char expected, char *str_to_print_if
     return false;
 }
 
-char *print_menu(void) {
+static char *print_menu(void) {
     // Added option [d], felt like it was missing
     char *menu = ("\n\n   |----- MENU -----|\n"
                   "-> [A]dd merchandise\n"
@@ -93,12 +93,19 @@ char *print_menu(void) {
     return menu;
 }
 
-void print_merch(char *string)
+static void print_merch(char *string)
 {
     printf("Name: %s\n", string);
 }
 
-void ui_add_merch(store_t *store)
+static void print_shelf(shelf_t *shelf)
+{
+    printf("Shelf: %s\n ->Quantity: %zu\n", shelf->shelf_name, shelf->quantity);
+
+    return;
+}
+
+static void ui_add_merch(store_t *store)
 {
     printf("-----ADD MERCH TO STORE-----\n");
     char *merch_name = ask_question_string("Name of new merch: ");
@@ -109,7 +116,7 @@ void ui_add_merch(store_t *store)
 
 }
 
-void ui_list_merchandise(store_t *store)
+static void ui_list_merchandise(store_t *store)
 {
     printf("-----LIST MERCHANDISE-----\n");
     size_t size = 0;
@@ -119,7 +126,7 @@ void ui_list_merchandise(store_t *store)
     {
         if (i != 0 && i % 2 == 0)
         {
-            if (confirmation_procedure("Do you want to keep printing merchandise? [Y/N]: ", 'N', "RETURNING TO MENU\n"))
+            if (confirmation_procedure("Do you want to keep printing merchandise? [Y/N]: ", 'N', "Returning to menu!\n"))
             {
                 break;
             }
@@ -128,10 +135,12 @@ void ui_list_merchandise(store_t *store)
         print_merch(array_of_merch[i].s);
     }
     
+    free(array_of_merch);
+
     return;
 }
 
-void ui_remove_merchandise(store_t *store)
+static void ui_remove_merchandise(store_t *store)
 {   
     printf("-----REMOVE MERCH-----\n");
 
@@ -142,7 +151,7 @@ void ui_remove_merchandise(store_t *store)
         
         if (!confirmation_procedure("Are you sure that you want to remove this merch from store? [Y/N]: ", 'Y', "REMOVING MERCH FROM STORE\n"))
         {
-            printf("Removal not executed\nRETURNING TO STORE\n");
+            printf("Removal not executed\nReturning to menu!\n");
             return;
         }
     
@@ -156,7 +165,7 @@ void ui_remove_merchandise(store_t *store)
         {
             printf("FAILED TO REMOVE: merch not found\n");
 
-            if (confirmation_procedure("Do you wish to try again? [Y/N]: ", 'N', "RETURNING TO MENU\n"))
+            if (confirmation_procedure("Do you wish to try again? [Y/N]: ", 'N', "Returning to menu!\n"))
             {
                 done = true;
             }
@@ -167,7 +176,7 @@ void ui_remove_merchandise(store_t *store)
     return;
 }
 
-void ui_edit_merch(store_t *store)
+static void ui_edit_merch(store_t *store)
 {
     printf("-----EDIT MERCH-----\n");
 
@@ -183,7 +192,7 @@ void ui_edit_merch(store_t *store)
         
         if (!confirmation_procedure("Do you wish to complete the edit? [Y/N]: ", 'Y', "COMPLETING EDIT\n"))
         {
-            printf("Edit not completed\nRETURNING TO MENU\n");
+            printf("Edit not completed\nReturning to menu!\n");
             return;
         }
 
@@ -197,13 +206,78 @@ void ui_edit_merch(store_t *store)
         {
             printf("FAILED TO EDIT: Name of merch to edit was invalid or new name is already taken.\n");
             
-            if (confirmation_procedure("Do you wish to try again? [Y/N]: ", 'N', "RETURNING TO MENU\n"))
+            if (confirmation_procedure("Do you wish to try again? [Y/N]: ", 'N', "Returning to menu!\n"))
             {
                 done = true;
             }
         }
 
     } while (done == false);
+
+    return;
+}
+
+static void ui_show_stock(store_t *store)
+{
+    printf("-----SHOW STOCK-----\n");
+    char *merch_name = ask_question_string("Name of merch: ");
+
+
+    elem_t merch_of_intrest;
+    if (!ioopm_hash_table_lookup(store->merchandise, string_elem(merch_name), &merch_of_intrest))
+    {
+        printf("FAILED TO SHOW STOCK: name of merch is does not exist in store\nReturning to menu!\n");
+        return;
+    }
+
+    merch_t *merch = merch_of_intrest.p;
+    
+    size_t size = 0;
+    elem_t *array_of_shelfs = list_shelves(merch, &size);
+
+    if (array_of_shelfs == NULL)
+    {
+        printf("Merch does not have any stock.\nReturning to menu!\n");
+        return;
+    }
+
+    for (size_t i = 0; i < size; i++)
+    {
+        shelf_t *shelf = array_of_shelfs[i].p;
+        print_shelf(shelf);
+    }
+
+    free(array_of_shelfs);
+    
+    return;
+}
+
+static void ui_replenish(store_t *store)
+{
+    printf("-----REPLENISH STOCK-----\n");
+
+    char *shelf = ask_question_shelf("Enter a shelf ID (e.g. A10): ");
+    char *name = ask_question_string("Enter merchandise name to replenish: ");
+    size_t quantity = (size_t) ask_question_int("Quantity of merchandise: ", is_positive_number);
+
+    bool replenished = replenish_stock(store, shelf, name, quantity);
+
+    if (!replenished)
+    {
+        printf("Could not replenish stock. Please check that:\n"
+               "  -> The shelf is empty or already contains this merchandise.\n"
+               "  -> The merchandise exists in the store.\n"
+               "  -> The quantity is at least 1.\n");
+        
+        return;
+    }
+    
+    elem_t result;
+    ioopm_hash_table_lookup(store->stock, string_elem(shelf), &result);
+    shelf_t *shelf_data = result.p;
+
+    printf("Replenish completed. \n");
+    print_shelf(shelf_data);
 
     return;
 }
@@ -230,15 +304,15 @@ int event_loop(store_t *store) {
         {
             ui_edit_merch(store);   
         } 
-        /*
         else if (user_choice == 'S')
         {
-            
+            ui_show_stock(store);            
         } 
         else if (user_choice == 'P') 
         {
-            
+            ui_replenish(store);
         } 
+        /*
         else if (user_choice == 'C') 
         {
             

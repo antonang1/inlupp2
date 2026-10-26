@@ -143,6 +143,12 @@ void stock_update_merch_name(merch_t *edited_merch)
 // ui.c does when calling this function!!! 
 elem_t *list_shelves(merch_t *merch, size_t *size_out)
 {
+    if (merch->shelfs == NULL)
+    {
+        *size_out = 0;
+        return NULL;
+    }
+
     *size_out = ioopm_list_size(merch_shelves(merch));
     elem_t *shelves = calloc(*size_out, sizeof(elem_t));
     
