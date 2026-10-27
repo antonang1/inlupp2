@@ -81,7 +81,7 @@ bool replenish_stock(store_t *store, char *shelf_name, char *merch_name, size_t 
     shelf_t *new_shelf = shelf_create(shelf_name, merch_name);
     new_shelf->quantity = quantity;
     
-    ioopm_hash_table_insert(store->stock, string_elem(shelf_name), ptr_elem(new_shelf));
+    ioopm_hash_table_insert(store->stock, string_elem(new_shelf->shelf_name), ptr_elem(new_shelf));
     
     // also add pointer to shelf in merch->shelfs
     merch_t *merch = result_merch_exists.p;

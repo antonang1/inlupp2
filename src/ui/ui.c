@@ -67,9 +67,13 @@ static bool confirmation_procedure(char *question, char expected, char *str_to_p
     if (confirmation_starts_with(confirmation, expected))
     {
         printf("%s", str_to_print_if_confrimed);
+
+        free(confirmation);
+        
         return true;
     }
     
+    free(confirmation);
     return false;
 }
 
@@ -113,6 +117,9 @@ static void ui_add_merch(store_t *store)
     size_t merch_price = (size_t) ask_question_int("Price of merch: ", is_positive_number);
 
     merch_add_to_store(store, merch_name, merch_desc, merch_price);
+    
+    free(merch_name);
+    free(merch_desc);
 
 }
 
@@ -159,6 +166,7 @@ static void ui_remove_merchandise(store_t *store)
         if (remove_success)
         {
             printf("The following merch has been removed from store: '%s'\n", merch_of_intrest);
+            free(merch_of_intrest);
             done = true;
         }
         else
@@ -171,6 +179,7 @@ static void ui_remove_merchandise(store_t *store)
             }
         } 
 
+        free(merch_of_intrest);
     } while (done == false);
 
     return;
@@ -193,6 +202,10 @@ static void ui_edit_merch(store_t *store)
         if (!confirmation_procedure("Do you wish to complete the edit? [Y/N]: ", 'Y', "COMPLETING EDIT\n"))
         {
             printf("Edit not completed\nReturning to menu!\n");
+
+            free(merch_to_edit);
+            free(new_name);
+            free(new_desc);
             return;
         }
 
@@ -211,6 +224,10 @@ static void ui_edit_merch(store_t *store)
                 done = true;
             }
         }
+        
+    free(merch_to_edit);
+    free(new_name);
+    free(new_desc);
 
     } while (done == false);
 
@@ -227,6 +244,8 @@ static void ui_show_stock(store_t *store)
     if (!ioopm_hash_table_lookup(store->merchandise, string_elem(merch_name), &merch_of_intrest))
     {
         printf("FAILED TO SHOW STOCK: name of merch is does not exist in store\nReturning to menu!\n");
+        
+        free(merch_name);
         return;
     }
 
@@ -238,16 +257,22 @@ static void ui_show_stock(store_t *store)
     if (array_of_shelfs == NULL)
     {
         printf("Merch does not have any stock.\nReturning to menu!\n");
+
+        free(array_of_shelfs);
+        free(merch_name);
         return;
     }
 
     for (size_t i = 0; i < size; i++)
     {
-        shelf_t *shelf = array_of_shelfs[i].p;
+        elem_t result;
+        ioopm_hash_table_lookup(store->stock, array_of_shelfs[i], &result);
+        shelf_t *shelf = result.p;
         print_shelf(shelf);
     }
 
     free(array_of_shelfs);
+    free(merch_name);
     
     return;
 }
@@ -269,6 +294,8 @@ static void ui_replenish(store_t *store)
                "  -> The merchandise exists in the store.\n"
                "  -> The quantity is at least 1.\n");
         
+        free(shelf);
+        free(name);
         return;
     }
     
@@ -279,6 +306,8 @@ static void ui_replenish(store_t *store)
     printf("Replenish completed. \n");
     print_shelf(shelf_data);
 
+    free(shelf);
+    free(name);
     return;
 }
 

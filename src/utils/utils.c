@@ -11,6 +11,15 @@
 
 extern char *strdup(const char *);
 
+static answer_t make_string(char *str)
+{
+    return (answer_t) { .string_value = strdup(str) };
+}
+static answer_t make_int(char *str)
+{
+    return (answer_t) { .int_value = atoi(str) };
+}
+
 typedef bool check_func(char *);
 
 typedef answer_t convert_func(char *);
@@ -43,7 +52,7 @@ int read_string(char *buf, int buf_siz) {
         conversions++;
         buf_index++;
  
-    } while (buf_index < buf_siz);
+    } while (buf_index < buf_siz - 1);
 
     if (scanned_char != '\n' || buf_index == buf_siz) {
         clear_input_buffer();
@@ -148,7 +157,7 @@ bool is_positive_number(char *str) {
 }
 
 int ask_question_int(char *question, check_func *check) {
-    return ask_question(question, check, (convert_func *) atoi).int_value;
+    return ask_question(question, check, make_int).int_value;
 }
 
 
@@ -200,7 +209,7 @@ bool not_empty(char *str) {
 }
 
 char *ask_question_string(char *question) {
-  return ask_question(question, not_empty, (convert_func *) strdup).string_value;
+  return ask_question(question, not_empty, make_string).string_value;
 }
 
 // ITEMS (for lab4 db.c)
@@ -231,7 +240,7 @@ bool is_shelf(char *str) {
 }
 
 char *ask_question_shelf(char*question) {
-    return ask_question(question, is_shelf, (convert_func *) strdup).string_value;
+    return ask_question(question, is_shelf, make_string).string_value;
 }
 
 
