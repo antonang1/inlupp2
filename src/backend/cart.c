@@ -21,7 +21,18 @@ cart_t *cart_create(size_t id)
     new_cart->id = id;
     new_cart->items = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
+
+
     return new_cart;
+}
+
+void add_cart_to_store(store_t *store, cart_t *cart)
+{
+    ioopm_hash_table_insert(store->carts, int_elem(cart->id), ptr_elem(cart));
+
+    store->next_cart_id++;
+
+    return;
 }
 
     

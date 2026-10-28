@@ -22,6 +22,8 @@ struct cart
 
 cart_t *cart_create(size_t id);
 
+void add_cart_to_store(store_t *store, cart_t *cart); //ANTON LAGGT TILL DENNA, förut var man tvungen att inserta själv o de kändes inte som att fronend skulle göra det, förut var också next_valid_id eller vad den heter i store alltid samma, ändradet alldrig.
+
 bool add_to_cart(store_t *store, size_t id, char *name, size_t quantity);
 
 bool remove_cart(store_t *store, size_t id);

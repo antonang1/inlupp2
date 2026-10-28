@@ -311,6 +311,16 @@ static void ui_replenish(store_t *store)
     return;
 }
 
+static void ui_create_cart(store_t *store)
+{
+    cart_t *new_cart = cart_create(store->next_cart_id);
+    add_cart_to_store(store, new_cart);
+
+    printf("A new cart has been created!\nCart id: '%zu'\nReturning to menu!", new_cart->id);
+
+    return;
+}
+
 int event_loop(store_t *store) {
     bool run = true;
     char user_choice;
@@ -341,11 +351,12 @@ int event_loop(store_t *store) {
         {
             ui_replenish(store);
         } 
-        /*
         else if (user_choice == 'C') 
         {
-            
+          ui_create_cart(store);  
+          // vill vi skapa en funktion som listar alla carts som finns och en functino som listar alla items i en viss cart?
         } 
+        /*
         else if (user_choice == 'R') 
         {
             
