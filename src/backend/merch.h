@@ -32,7 +32,11 @@ int merch_price(merch_t *merch);
 ///         equal, and a positive value if a sorts after b.
 int comparison_merch(elem_t a, elem_t b);
 
-
+/// @brief Frees an item and everything it owns.
+/// @param merch The item to destroy. Does nothing if merch is NULL.
+/// @note Destroys the shelf list if the item has one, then frees name,
+///       desc and the struct itself.
+/// @note Any pointer the caller still holds to the item becomes invalid.
 void merch_destroy(merch_t *value);
 
 /// @brief Creates a merchandise item from the given fields.
@@ -74,4 +78,13 @@ bool merch_remove_from_store(store_t *store, char *merch_name);
 ///       because its key changes.
 bool merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, size_t new_price);
 
+/// @brief Returns all items in the store, sorted by name, as an array of
+///        elem_t holding the item names.
+/// @param store The store to read from.
+/// @param size_out Written with the number of items returned.
+/// @return A heap-allocated array of elem_t holding string elements with
+///         each item's name, or an array of size 0 if the store is empty.
+/// @note The array is owned by the caller, who must free it. Only the name
+///       strings are handed out, and they belong to the items, so the
+///       caller must not free them.
 elem_t *list_merchandise(store_t *store, size_t *size_out);

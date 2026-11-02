@@ -132,6 +132,7 @@ bool is_number(char *str) {
     return true;
 }
 
+// NOTE: Zero is conisdered a positive number!
 bool is_positive_number(char *str) {
     int str_len = strlen(str);
     int index = 0;
@@ -142,7 +143,7 @@ bool is_positive_number(char *str) {
     }
     
     // check if negative
-    if (str[index] == '-' || str[index] == '0') {
+    if (str[index] == '-') {
         return false;
     }
     

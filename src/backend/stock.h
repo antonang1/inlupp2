@@ -1,12 +1,10 @@
 #pragma once
 
-#include "merch.h"
+#include "merch.h" 
 #include "../utils/utils.h"
 #include <stdlib.h>
 #include <string.h>
 #include "../data_structures/hash_table.h"
-
-typedef struct shelf shelf_t;
 
 struct shelf
 {
@@ -15,6 +13,8 @@ struct shelf
     size_t quantity;
 };
 
+typedef struct merch merch_t;
+typedef struct shelf shelf_t;
 
 /// @brief Compares two shelves by shelf name, for sorting.
 /// @param a An elem_t holding a shelf_t pointer.
@@ -42,8 +42,23 @@ shelf_t *shelf_create(const char *shelf, const char *merch_name);
 /// @note If the shelf is new, the store takes ownership of it
 bool replenish_stock(store_t *store, char *shelf_name, char *merch_name, size_t quantity);
 
+/// @brief Removes an item's shelves from the store's stock table.
+/// @param store The store to remove the shelves from.
+/// @param merch_to_clear The item whose shelves are to be removed.
+/// @return true if every shelf was found and removed, false as soon as
+///         one shelf could not be removed.
+/// @note Removes the shelves from the stock table only. The list inside
+///       the item is not touched, so freeing it stays the caller's job.
 bool stock_remove_merch(store_t *store, merch_t *merch_to_clear);
 
+/// @brief Writes the item's current name onto every shelf that holds it.
+/// @param edited_merch The item whose name was changed. Its shelfs list is
+///                     traversed and each shelf's merch_name is replaced.
+/// @note Frees the old merch_name string and strdups the new one, so each
+///       shelf owns its own copy.
+/// @note Requires edited_merch->shelfs to be non-NULL. It is called from
+///       merch_edit, which already checks for that, but the function does
+///       not check on its own.
 void stock_update_merch_name(merch_t *edited_merch);
 
 /// @brief Returns all shelves holding a given item, sorted by shelf name.
@@ -54,3 +69,11 @@ void stock_update_merch_name(merch_t *edited_merch);
 /// @note The array is owned by the caller, who must free it. 
 ///       The shelves themselves belong to the store and must not be freed.
 elem_t *list_shelves(merch_t *merch, size_t *size_out);
+
+/// @brief Returns the total number of units of an item, across all its shelves.
+/// @param merch The item whose shelves to sum.
+/// @return The sum of the quantity on every shelf holding the item,
+///         or 0 if the item has no shelves.
+/// @note Reads the shelves through the item's own list, not through the
+///       store's stock table, so no lookup is needed.
+size_t get_total_stock(merch_t *merch);

@@ -8,21 +8,6 @@
 #include <stdio.h>
 #include <ctype.h>
 
-
-// ui_add_merch(db) : A
-// ui_list_merch(db) : L
-// ui_remove_merch(db) : D
-// ui_edit_merch(db) : E
-// ui_show_stock(db, store) : S
-// ui_replenish(db) : P
-// ui_create_cart(db, store) : C
-// ui_remove_cart(store) : R
-// ui_add_to_cart(db, store) : +
-// ui_remove_from_cart(store) : -
-// ui_calc_cost(db, store) : =
-// ui_checkout(db, store) : O 
-// ui_quit() : Q
-
 // MENU
 // Needed because toupper() takes an int as arg but a convert_func expects a char * as arg
 
@@ -151,37 +136,25 @@ static void ui_remove_merchandise(store_t *store)
 {   
     printf("-----REMOVE MERCH-----\n");
 
-    bool done = false;
-
-    do {
-        char *merch_of_intrest = ask_question_string("Name of merch to remove from store: ");
-        
-        if (!confirmation_procedure("Are you sure that you want to remove this merch from store? [Y/N]: ", 'Y', "REMOVING MERCH FROM STORE\n"))
-        {
-            printf("Removal not executed\nReturning to menu!\n");
-            return;
-        }
+    char *merch_of_intrest = ask_question_string("Name of merch to remove from store: ");
     
-        bool remove_success = merch_remove_from_store(store, merch_of_intrest);
-        if (remove_success)
-        {
-            printf("The following merch has been removed from store: '%s'\n", merch_of_intrest);
-            free(merch_of_intrest);
-            done = true;
-        }
-        else
-        {
-            printf("FAILED TO REMOVE: merch not found\n");
-
-            if (confirmation_procedure("Do you wish to try again? [Y/N]: ", 'N', "Returning to menu!\n"))
-            {
-                done = true;
-            }
-        } 
-
+    if (!confirmation_procedure("Are you sure that you want to remove this merch from store? [Y/N]: ", 'Y', "REMOVING MERCH FROM STORE\n"))
+    {
+        printf("Removal not executed\nReturning to menu!\n");
         free(merch_of_intrest);
-    } while (done == false);
+        return;
+    }
 
+    bool remove_success = merch_remove_from_store(store, merch_of_intrest);
+    if (remove_success)
+    {
+        printf("The following merch has been removed from store: '%s'\n", merch_of_intrest);    
+    }
+    else
+    {
+        printf("FAILED TO REMOVE: merch not found\nReturning to menu!\n");
+    }
+    free(merch_of_intrest);
     return;
 }
 
@@ -189,47 +162,36 @@ static void ui_edit_merch(store_t *store)
 {
     printf("-----EDIT MERCH-----\n");
 
-    bool done = false;
-
-    do
+    char *merch_to_edit = ask_question_string("Name of merch to edit: ");
+    
+    char *new_name = ask_question_string("New name: ");
+    char *new_desc = ask_question_string("New description: ");
+    int new_price = ask_question_int("New price (positive integer): ", is_positive_number);
+    
+    if (!confirmation_procedure("Do you wish to complete the edit? [Y/N]: ", 'Y', "COMPLETING EDIT\n"))
     {
-        char *merch_to_edit = ask_question_string("Name of merch to edit: ");
-        
-        char *new_name = ask_question_string("New name: ");
-        char *new_desc = ask_question_string("New description: ");
-        int new_price = ask_question_int("New price (positive integer): ", is_positive_number);
-        
-        if (!confirmation_procedure("Do you wish to complete the edit? [Y/N]: ", 'Y', "COMPLETING EDIT\n"))
-        {
-            printf("Edit not completed\nReturning to menu!\n");
+        printf("Edit not completed\nReturning to menu!\n");
 
-            free(merch_to_edit);
-            free(new_name);
-            free(new_desc);
-            return;
-        }
+        free(merch_to_edit);
+        free(new_name);
+        free(new_desc);
+        return;
+    }
 
-        bool edit_success = merch_edit(store, merch_to_edit, new_name, new_desc, (size_t) new_price);
-        if (edit_success)
-        {
-            printf("Edit completed: '%s' is now '%s'", merch_to_edit, new_name);
-            done = true;
-        }
-        else
-        {
-            printf("FAILED TO EDIT: Name of merch to edit was invalid or new name is already taken.\n");
-            
-            if (confirmation_procedure("Do you wish to try again? [Y/N]: ", 'N', "Returning to menu!\n"))
-            {
-                done = true;
-            }
-        }
-        
+    bool edit_success = merch_edit(store, merch_to_edit, new_name, new_desc, (size_t) new_price);
+
+    if (edit_success)
+    {
+        printf("Edit completed: '%s' is now '%s'", merch_to_edit, new_name);
+    }
+    else
+    {
+        printf("FAILED TO EDIT: Name of merch to edit was invalid or new name is already taken.\n");
+    }
+
     free(merch_to_edit);
     free(new_name);
     free(new_desc);
-
-    } while (done == false);
 
     return;
 }
@@ -243,7 +205,7 @@ static void ui_show_stock(store_t *store)
     elem_t merch_of_intrest;
     if (!ioopm_hash_table_lookup(store->merchandise, string_elem(merch_name), &merch_of_intrest))
     {
-        printf("FAILED TO SHOW STOCK: name of merch is does not exist in store\nReturning to menu!\n");
+        printf("FAILED TO SHOW STOCK: name of merch does not exist in store\nReturning to menu!\n");
         
         free(merch_name);
         return;
@@ -321,6 +283,111 @@ static void ui_create_cart(store_t *store)
     return;
 }
 
+static void ui_remove_cart(store_t *store)
+{
+    printf("-----REMOVE CART-----\n");
+
+    int cart_to_remove = ask_question_int("ID of cart to remove: ", is_positive_number);
+
+    if (!confirmation_procedure("Are you sure that you want to remove this cart form the store? [Y/N]: ", 'Y', "REMOVING CART FROM STORE\n"))
+    {
+        printf("Removal not executed\nReturning to menu!\n");
+        return;
+    }
+
+    bool removed = remove_cart(store, (size_t) cart_to_remove);
+
+    if (removed)
+    {
+        printf("The following cart has been removed from store: '%d'", cart_to_remove);
+    }
+    else
+    {
+        printf("FAILED TO REMOVE: cart not found\n");
+    }
+    return;
+}
+
+static void ui_add_to_cart(store_t *store)
+{
+    printf("-----ADD MERCHANDISE TO CART-----\n");
+
+    int cart_of_intrest = ask_question_int("ID of cart: ", is_positive_number);
+    char *merch_to_add = ask_question_string("Name of merch to add to cart: ");
+    int quantity = ask_question_int("Amount: ", is_positive_number);
+
+    bool added = add_to_cart(store, (size_t) cart_of_intrest, merch_to_add, (size_t) quantity);
+
+    if (added)
+    {
+        printf("%d '%s' has been added to cart '%d'.\nReturning to menu!", quantity, merch_to_add, cart_of_intrest);
+    }
+    else
+    {
+        printf("FAILD TO ADD MERCHANDISE TO CART: Cart id is invalid and/or merchandise does not exsist in store.\nReturning to menu!\n");
+    }
+
+    free(merch_to_add);
+    return;
+
+}
+
+static void ui_remove_from_cart(store_t *store)
+{
+    printf("-----REMOVE MERCHANDISE FROM CART-----\n");
+
+    int cart_id = ask_question_int("ID of cart: ", is_positive_number);
+    char *merch_name = ask_question_string("Name of merchandise: ");
+    int quantity = ask_question_int("Amount of merchandise to remove from cart: ", is_positive_number);
+    
+    bool removed = remove_from_cart(store, (size_t) cart_id, merch_name, (size_t) quantity);
+
+    if (removed)
+    {
+        printf("%d '%s' in cart '%d' has been removed\nReturning to menu!\n", quantity, merch_name, cart_id);
+    }
+    else
+    {
+        printf("FAILED TO REMOVE: Cart does not exist and/or merch does not exist and/or the requested amount is too large.\nReturning to menu!\n");
+    }
+
+    free(merch_name);
+    return;
+}
+
+static void ui_calculate_cost(store_t *store)
+{
+    printf("-----CALCULATE COST-----\n");
+
+    int cart_id = ask_question_int("ID of cart: ", is_positive_number);
+    int price = calculate_cost(store, (size_t) cart_id); 
+    printf("The toal cost is: %d\nReturning to menu!\n", price);
+    return; 
+}
+
+static void ui_checkout(store_t *store)
+{
+    printf("-----CHECKOUT CART-----\n");
+
+    int cart_id = ask_question_int("ID of cart: ", is_positive_number);
+    int price = calculate_cost(store, (size_t) cart_id);
+    bool checked_out = checkout(store, (size_t) cart_id);
+
+    if (checked_out)
+    {
+        printf("Purchase completed, total price: %d", price);
+    }
+    else {
+        printf("Purchase failed:\n"
+               "=> Cart ID does not exist\n"
+               "=> and/or merchandise does no longer exist in store\n" 
+               "=> and/or there is not enough stock for atleast one merchandise\n");
+               
+        printf("Returning to menu!\n");
+    }
+    return;
+}
+
 int event_loop(store_t *store) {
     bool run = true;
     char user_choice;
@@ -356,33 +423,32 @@ int event_loop(store_t *store) {
           ui_create_cart(store);  
           // vill vi skapa en funktion som listar alla carts som finns och en functino som listar alla items i en viss cart?
         } 
-        /*
         else if (user_choice == 'R') 
         {
-            
+            // ska denna ha loopen som remove_merch har? eller ska ingen av de ha det?
+            ui_remove_cart(store);
         } 
         else if (user_choice == '+') 
         {
-            
+
+            ui_add_to_cart(store);
         } 
         else if (user_choice == '-') 
         {
-            
+            ui_remove_from_cart(store);
         } 
         else if (user_choice == '=') 
         {
-            
+            ui_calculate_cost(store);
         } 
-         else if (user_choice == 'O') 
-         {
-             
-         } 
-        */
+        else if (user_choice == 'O') 
+        {
+            ui_checkout(store);
+        }
         else if (user_choice == 'Q') 
         {
             run = false;
         }
-        
     }
     return 1;
 }

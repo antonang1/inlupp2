@@ -10,8 +10,7 @@ SRC = src/data_structures/hash_table.c \
       src/backend/stock.c \
       src/backend/merch.c \
       src/backend/cart.c \
-	  src/ui/ui.c \
-	  main.c
+	  src/ui/ui.c
 
 # --- Merch tests ---
 compile_merch: $(SRC) src/tests/test_merch.c
@@ -46,7 +45,7 @@ test_store: compile_store
 	valgrind --leak-check=full src/tests/test_store
 
 # --- Run all suites ---
-test: test_merch test_cart test_stock test_store
+test: test_merch test_stock test_store test_cart
 
 compile_main: $(SRC)
 	gcc $(CFLAGS) $(SRC) -o main

@@ -1,22 +1,15 @@
 #pragma once
 #include "../utils/utils.h"
 #include "../backend/store.h"
-// One function per action code, each reading its own input lines and calling exactly one backend function.
-
-// ui_add_merch(db) : A
-// ui_list_merch(db) : L
-// ui_remove_merch(db) : D
-// ui_edit_merch(db) : E
-// ui_show_stock(db, store) : S
-// ui_replenish(db) : P
-// ui_create_cart(db, store) : C
-// ui_remove_cart(store) : R
-// ui_add_to_cart(db, store) : +
-// ui_remove_from_cart(store) : -
-// ui_calc_cost(db, store) : =
-// ui_checkout(db, store) : O
-// ui_undo(db) : U
-// ui_quit() : Q
 
 
+/// @brief Runs the menu loop, executing the user's chosen command until
+///        the user chooses to quit.
+/// @param store The store every command reads from and writes to.
+/// @return Always 1. The value signals that the loop has ended, not
+///         whether anything succeeded.
+/// @note Dispatches the upper-cased menu character through an if/else
+///       chain against A, L, D, E, S, P, C, R, U, +, -, =, O and Q.
+/// @note Only Q ends the loop, by setting run to false. Nothing else
+///       inside the loop can leave it.
 int event_loop(store_t *store);

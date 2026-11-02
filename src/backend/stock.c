@@ -168,3 +168,20 @@ elem_t *list_shelves(merch_t *merch, size_t *size_out)
 
     return shelves;
 }
+
+size_t get_total_stock(merch_t *merch)
+{
+    if (!merch->shelfs) { return 0; }
+
+    size_t total = 0;
+    ioopm_list_node_t *current = merch->shelfs->first;
+
+    while (current)
+    {
+        shelf_t *current_shelf = current->head.p;
+        total += current_shelf->quantity;
+        current = current->tail;
+    }
+
+    return total;
+}

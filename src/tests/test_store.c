@@ -8,6 +8,12 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+/**
+* NOTE: The draft of the tests for this module was created with KLAR (combination of Claude, Chat GTP and Gemini).
+* It has been proofread by Signe von Greiff and Anton Äng and changed when needed. 
+*/
+
+
 int init_suite(void)
 {
     return 0;

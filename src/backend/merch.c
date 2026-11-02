@@ -5,7 +5,6 @@
 #include <string.h>
 #include "../data_structures/hash_table.h"
 #include "../data_structures/hash_table_iterator.h"
-#include "../data_structures/hash_table.h"
 #include "../data_structures/linked_list.h"
 #include <stdio.h>
 

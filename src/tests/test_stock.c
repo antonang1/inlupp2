@@ -11,6 +11,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+
+/**
+* NOTE: The draft of the tests for this module was created with KLAR (combination of Claude, Chat GTP and Gemini).
+* It has been proofread by Signe von Greiff and Anton Äng and changed when needed. 
+*/
+
 int init_suite(void) { return 0; }
 int clean_suite(void) { return 0; }
 
@@ -291,6 +297,59 @@ void test_stock_update_merch_name(void)
     store_destroy(store);
 }
 
+// -------------- TESTS get_total_stock --------------
+void test_get_total_stock_empty_merch(void)
+{
+    store_t *store = store_create();
+    merch_add_to_store(store, "Apple", "Red apple", 10);
+
+    elem_t merch_result;
+    ioopm_hash_table_lookup(store->merchandise, string_elem("Apple"), &merch_result);
+    merch_t *merch = merch_result.p;
+
+    // No shelves yet, so the total must be zero
+    CU_ASSERT_EQUAL(get_total_stock(merch), 0);
+
+    store_destroy(store);
+}
+
+void test_get_total_stock_sums_shelves(void)
+{
+    store_t *store = store_create();
+    merch_add_to_store(store, "Apple", "Red apple", 10);
+
+    replenish_stock(store, "A10", "Apple", 3);
+    replenish_stock(store, "B20", "Apple", 5);
+    replenish_stock(store, "C30", "Apple", 2);
+
+    elem_t merch_result;
+    ioopm_hash_table_lookup(store->merchandise, string_elem("Apple"), &merch_result);
+    merch_t *merch = merch_result.p;
+
+    CU_ASSERT_EQUAL(get_total_stock(merch), 10);
+
+    store_destroy(store);
+}
+
+void test_get_total_stock_ignores_other_merch(void)
+{
+    store_t *store = store_create();
+    merch_add_to_store(store, "Apple", "Red apple", 10);
+    merch_add_to_store(store, "Pear", "Green pear", 15);
+
+    replenish_stock(store, "A10", "Apple", 3);
+    replenish_stock(store, "B20", "Pear", 7);
+
+    elem_t merch_result;
+    ioopm_hash_table_lookup(store->merchandise, string_elem("Apple"), &merch_result);
+    merch_t *apple = merch_result.p;
+
+    // Pear's shelf must not be counted into Apple's total
+    CU_ASSERT_EQUAL(get_total_stock(apple), 3);
+
+    store_destroy(store);
+}
+
 int main()
 {
     if (CU_initialize_registry() != CUE_SUCCESS)
@@ -317,7 +376,10 @@ int main()
         || CU_add_test(my_test_suite, "List shelves: single", test_list_shelves_single) == NULL
         || CU_add_test(my_test_suite, "Remove all shelves of a merch", test_stock_remove_merch) == NULL
         || CU_add_test(my_test_suite, "Remove shelves leaves other merch", test_stock_remove_merch_leaves_other_merch) == NULL
-        || CU_add_test(my_test_suite, "Update merch name on shelves", test_stock_update_merch_name) == NULL)
+        || CU_add_test(my_test_suite, "Update merch name on shelves", test_stock_update_merch_name) == NULL
+        || CU_add_test(my_test_suite, "Total stock: empty merch", test_get_total_stock_empty_merch) == NULL
+        || CU_add_test(my_test_suite, "Total stock: sums shelves", test_get_total_stock_sums_shelves) == NULL
+        || CU_add_test(my_test_suite, "Total stock: ignores other merch", test_get_total_stock_ignores_other_merch) == NULL)
     {
         CU_cleanup_registry();
         return CU_get_error();

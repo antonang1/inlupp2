@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "../data_structures/hash_table.h"
+#include "../data_structures/hash_table_iterator.h"
 #include "../utils/utils.h"
 
 ioopm_hash_table_t *store_stock(store_t *store)
@@ -62,6 +63,16 @@ static void cart_destroy_callback(elem_t value)
     {
         return;
     }
+    ioopm_hash_table_iterator_t *iter = ioopm_hash_table_iterator_create(cart->items);
+
+    while (!ioopm_hash_table_iterator_at_end(iter))
+    {
+        elem_t key = ioopm_hash_table_iterator_current_key(iter);
+        free(key.s);
+
+        ioopm_hash_table_iterator_advance(iter);
+    }
+    ioopm_hash_table_iterator_destroy(iter);
 
     ioopm_hash_table_destroy(cart->items);   
     free(cart);                              
