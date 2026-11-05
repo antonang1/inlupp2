@@ -1,6 +1,9 @@
 #pragma once
 
+#include <stddef.h>
 #include "../data_structures/hash_table.h"
+#include "../data_structures/hash_table_iterator.h"
+
 
 /* 
 NOTE: Documentation outline generated with KLAR, then rewritten and verified by Signe von Greiff and Anton Äng.

@@ -1,12 +1,6 @@
 #include "merch.h"
+#include "store.h"
 #include "stock.h"
-#include "../utils/utils.h"
-#include <stdlib.h>
-#include <string.h>
-#include "../data_structures/hash_table.h"
-#include "../data_structures/hash_table_iterator.h"
-#include "../data_structures/linked_list.h"
-#include <stdio.h>
 
 ioopm_list_t *merch_shelves(merch_t *merch)
 {
@@ -58,7 +52,6 @@ merch_t *merch_create(const char *name, const char *desc, size_t price)
     return new_merch;
 }
 
-//borde vi ha const på alla sånna här funcs?
 // 2.1.1 Add Merchandise
 bool merch_add_to_store(store_t *store, char *name, char *desc, size_t price)
 {  
@@ -103,7 +96,6 @@ bool merch_remove_from_store(store_t *store, char *merch_name)
 
 
 // 2.1.4 Edit Merchandise
-// TILL SENARE: KANSKE ÄNDRA SÅ ATT VI HAR IDS FÖR MAMN -> MERCH MAPPING I HT.
 bool merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, size_t new_price)
 {
     if (new_name == NULL)
@@ -161,7 +153,6 @@ bool merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, 
     
     return true;
 }
-
 
 // This function does not have ownership over the memeory allocated
 // ui.c does when calling this function!!! 

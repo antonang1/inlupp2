@@ -40,7 +40,8 @@ The user interface is not covered by the unit tests.
 
 The program is built and started with:
 
-make convert_merch ??? OSÄKER HÄR 
+make compile_main
+./main
 
 It enters an event loop and reads one action code at a time from
 standard input. A confirmation is asked for before anything is removed
@@ -72,8 +73,11 @@ again.
 
 ## Testing the interface
 
-The course supplies a script that runs through every action:
-webstoretest.txt. 
+The course supplies a script that runs through a sequence of actions:
+make compile_main
+./main < webstoretest.txt
+
+
 
 ## Module layout
 

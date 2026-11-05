@@ -1,15 +1,19 @@
 #pragma once
 
-#include "merch.h" 
-#include "../utils/utils.h"
-#include <stdlib.h>
-#include <string.h>
-#include "../data_structures/hash_table.h"
+
+#include <stddef.h>
+#include <stdbool.h>
+
+#include "../data_structures/list_iterator.h"
 
 /* 
 NOTE: Documentation outline generated with KLAR, then rewritten and verified by Signe von Greiff and Anton Äng.
 No code in this repository was generated.
 */
+
+typedef struct store store_t;
+typedef struct merch merch_t;
+typedef struct shelf shelf_t;
 
 struct shelf
 {
@@ -17,9 +21,6 @@ struct shelf
     char *merch_name;
     size_t quantity;
 };
-
-typedef struct merch merch_t;
-typedef struct shelf shelf_t;
 
 /// @brief Compares two shelves by shelf name, for sorting.
 /// @param a An elem_t holding a shelf_t pointer.

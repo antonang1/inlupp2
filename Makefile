@@ -47,8 +47,8 @@ test_store: compile_store
 # --- Run all suites ---
 test: test_merch test_stock test_store test_cart
 
-compile_main: $(SRC)
-	gcc $(CFLAGS) $(SRC) -o main
+compile_main: $(SRC) main.c
+	gcc $(CFLAGS) $(SRC) main.c -o main
 
 clean:
 	find . \( -name "*.gcno" -o -name "*.gcda" -o -name "*.gcov" \) -delete

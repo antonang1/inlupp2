@@ -1,16 +1,6 @@
 #include "stock.h"
-#include "merch.h"
 #include "store.h"
-#include "../utils/utils.h"
-#include <stdlib.h>
-#include <string.h>
-#include "../data_structures/hash_table.h"
-#include "../data_structures/hash_table_iterator.h"
-#include "../data_structures/list_iterator.h"
-#include "../data_structures/linked_list.h"
-#include <stdbool.h>
-#include <stdio.h>
-
+#include "merch.h"
 
 // RULE:
 // negative outcome: a before b
@@ -19,16 +9,6 @@
 int comparison_shelf(elem_t a, elem_t b)
 {
     return strcmp(a.s, b.s);
-    /*
-    shelf_t *shelf_a = a.p;
-    shelf_t *shelf_b = b.p;
-
-    if (shelf_a == NULL || shelf_b == NULL) 
-    {
-        return 0;
-    }
-    return(strcmp(shelf_a->shelf_name, shelf_b->shelf_name));
-    */
 
 }
 
@@ -44,7 +24,6 @@ shelf_t *shelf_create(const char *shelf, const char *merch_name)
     return new_shelf;
 }
 
-// ändra på shelf_t *shelf till att plocka in faktiska värdena (gör samma för merch_add_to_store)
 bool replenish_stock(store_t *store, char *shelf_name, char *merch_name, size_t quantity)
 {
     if (quantity < (size_t) 1)
@@ -120,7 +99,6 @@ bool stock_remove_merch(store_t *store, merch_t *merch_to_clear)
     return true;
 }
 
-// ska denna kanske vara i merch.c?
 void stock_update_merch_name(merch_t *edited_merch)
 {
     char *name_of_merch = edited_merch->name;

@@ -37,7 +37,7 @@ static bool string_compare(elem_t str1, elem_t str2){
 
 
 void test_iterating_empty(void) {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
   ioopm_hash_table_iterator_t *it = ioopm_hash_table_iterator_create(ht);
   printf("\ntesthär\n");
   CU_ASSERT_TRUE(ioopm_hash_table_iterator_at_end(it));
@@ -46,7 +46,7 @@ void test_iterating_empty(void) {
 }
 
 void test_iterating_singleton(void) {
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
 
   elem_t key = string_elem("A*");
   elem_t value = int_elem(123);
@@ -71,7 +71,7 @@ void test_iterator_several_entries(void) {
   char *keys[3] = {"abc", "qwe", "asd"};
   int values[3] = {0, 1, 2};
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
   for (int i = 0; i != 3; ++i) {
       elem_t key = string_elem(keys[i]);
       elem_t value = int_elem(values[i]);
@@ -95,7 +95,7 @@ void test_iterator_several_unique(void) {
   int values[3] = {0, 1, 2};
   bool visited[3] = {false, false, false};
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
   for (int i = 0; i != 3; i++) {
       elem_t key = string_elem(keys[i]);
       elem_t value = int_elem(values[i]);
@@ -131,7 +131,7 @@ void test_iterator_several_unique_same_bucket(void) {
   int values[3] = {0, 1, 2};
   bool visited[3] = {false, false, false};
 
-  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare);
+  ioopm_hash_table_t *ht = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, NULL);
   for (int i = 0; i != 3; ++i) {
       elem_t key = string_elem(keys[i]);
       elem_t value = int_elem(values[i]);

@@ -161,49 +161,6 @@ int ask_question_int(char *question, check_func *check) {
     return ask_question(question, check, make_int).int_value;
 }
 
-
-// FLOATS
-answer_t make_float(char *str) {
-  return (answer_t) { .float_value = atof(str) };
-}
-
-bool is_float(char *str)
-{
-    bool dot_found = false;
-    int i = 0;
-
-    if (str[0] == '\0')
-        return false;
-
-    if (str[0] == '-')
-        i++;
-
-    if (str[i] == '\0' || str[i] == '.')
-        return false;
-
-    for (; str[i] != '\0'; i++)
-    {
-        if (str[i] == '.')
-        {
-            if (dot_found)
-                return false;
-
-            dot_found = true;
-        }
-        else if (!isdigit(str[i]))
-        {
-            return false;
-        }
-    }
-
-    return dot_found;
-}
-
-double ask_question_float(char *question) {
-  return ask_question(question, is_float, make_float).float_value;
-}
-
-
 // STRINGS
 bool not_empty(char *str) {
     return strlen(str) > 0;
@@ -212,8 +169,6 @@ bool not_empty(char *str) {
 char *ask_question_string(char *question) {
   return ask_question(question, not_empty, make_string).string_value;
 }
-
-// ITEMS (for lab4 db.c)
 
 bool is_shelf(char *str) {
     int str_len = strlen(str);
@@ -243,8 +198,6 @@ bool is_shelf(char *str) {
 char *ask_question_shelf(char*question) {
     return ask_question(question, is_shelf, make_string).string_value;
 }
-
-
 
 void insertion_sort(elem_t *array, size_t length, comparison_func cmp)
 {

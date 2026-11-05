@@ -1,14 +1,19 @@
 #pragma once
 
-#include "../data_structures/hash_table.h"
+#include <stddef.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "../utils/utils.h"
 #include "../data_structures/linked_list.h"
-#include "store.h"
 
 /* 
 NOTE: Documentation outline generated with KLAR, then rewritten and verified by Signe von Greiff and Anton Äng.
 No code in this repository was generated.
 */
 
+typedef struct store store_t;
 typedef struct merch merch_t;
 
 struct merch

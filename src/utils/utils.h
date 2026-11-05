@@ -73,23 +73,6 @@ bool is_positive_number(char *str);
 /// @return The value as an int.
 int ask_question_int(char *question, check_func *check);
 
-/// @brief Turns a string into a float wrapped in an answer_t.
-/// @param str The string to convert.
-/// @return An answer_t holding the parsed float value.
-answer_t make_float(char *str);
-
-/// @brief Checks whether a string is a valid float.
-/// @param str The string to check.
-/// @return true if str has digits with exactly one decimal point and an
-///         optional leading minus. A string without a point is not
-///         accepted.
-bool is_float(char *str);
-
-/// @brief Asks for a float and validates it with is_float.
-/// @param question The text to print.
-/// @return The value as a double.
-double ask_question_float(char *question);
-
 /// @brief Checks that a string is not empty.
 /// @param str The string to check.
 /// @return true if str has at least one character.

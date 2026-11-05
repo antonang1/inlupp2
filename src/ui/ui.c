@@ -1,16 +1,7 @@
-
 #include "ui.h"
-#include "../utils/utils.h"
-#include "../backend/merch.h"
-#include "../backend/cart.h"
-#include "../backend/stock.h"
-#include "../backend/store.h"
-#include <stdio.h>
-#include <ctype.h>
 
 // MENU
 // Needed because toupper() takes an int as arg but a convert_func expects a char * as arg
-
 static bool is_valid_menu_choice(char *str) {
     int str_len = strlen(str);
 
@@ -388,6 +379,20 @@ static void ui_checkout(store_t *store)
     return;
 }
 
+static void ui_quit(bool *run)
+{
+    if (confirmation_procedure("Do you want to exist the store? [Y/N]: ", 'Y', "EXITING STORE\n"))
+    {
+        *run = false;
+    }
+    else
+    {
+        printf("Returning to menu!\n");
+    }
+    
+    return;
+}
+
 int event_loop(store_t *store) {
     bool run = true;
     char user_choice;
@@ -447,7 +452,7 @@ int event_loop(store_t *store) {
         }
         else if (user_choice == 'Q') 
         {
-            run = false;
+            ui_quit(&run);
         }
     }
     return 1;

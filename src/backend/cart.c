@@ -1,13 +1,7 @@
 #include "cart.h"
+#include "store.h"
 #include "merch.h"
 #include "stock.h"
-#include "store.h" 
-#include "../utils/utils.h"
-#include <stdlib.h>
-#include <string.h>
-#include "../data_structures/hash_table.h"
-#include "../data_structures/hash_table_iterator.h"
-#include <stdio.h>
 
 // OWNERSHIP: cart_create allocate memory but is not responsible for freeing it
 cart_t *cart_create(size_t id)
@@ -340,59 +334,6 @@ bool check_if_all_items_valid(store_t *store, ioopm_hash_table_t *items_of_cart)
     ioopm_hash_table_iterator_destroy(iter);
     return true;
 }
-/*
-bool check_if_all_items_valid(store_t *store, size_t id, ioopm_hash_table_t *items_of_cart)
-{
-    //traverse items of cart
-    ioopm_hash_table_iterator_t *iter = ioopm_hash_table_iterator_create(items_of_cart);
-
-    while (!ioopm_hash_table_iterator_at_end(iter))
-    {
-        elem_t current_key = ioopm_hash_table_iterator_current_key(iter);
-        elem_t current_value = ioopm_hash_table_iterator_current_value(iter);
-
-        if (!ioopm_hash_table_has_key(store->merchandise, current_key))
-        {
-
-            remove_from_cart(store, id, current_key.s, (size_t) current_value.i);
-
-            ioopm_hash_table_iterator_destroy(iter);
-            return false; 
-        }
-
-        elem_t merch;
-        ioopm_hash_table_lookup(store->merchandise, current_key, &merch);
-        
-        merch_t *current_merch = merch.p;
-        ioopm_list_t *shelfs = current_merch->shelfs;
-        ioopm_list_node_t *current_node = shelfs->first;
-
-        size_t total_stock = 0;
-
-        while (current_node != NULL)
-        {
-            shelf_t *current_shelf = current_node->head.p;
-
-            total_stock += current_shelf->quantity;
-
-            current_node = current_node->tail;
-        }
-
-        if (current_value.i > (int) total_stock)
-        {
-            remove_from_cart(store, id, current_key.s, (size_t) current_value.i);
-            
-            ioopm_hash_table_iterator_destroy(iter);
-            return false; 
-        }
-        
-        ioopm_hash_table_iterator_advance(iter);
-    }
-    ioopm_hash_table_iterator_destroy(iter);
-    return true;
-
-}
-*/
 
 bool checkout(store_t *store, size_t id)
 {
@@ -401,8 +342,8 @@ bool checkout(store_t *store, size_t id)
     {
         return false; 
     }
-    // Decrease the stock for the merches in the cart.
     
+    // Decrease the stock for the merches in the cart.
     cart_t *cart = cart_elem.p;
     ioopm_hash_table_t *items_of_cart = cart->items;
 

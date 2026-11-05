@@ -138,15 +138,15 @@ void test_add_cart_to_store_increments_next_id(void)
 {
     store_t *store = store_create();
 
-    CU_ASSERT_EQUAL(store->next_cart_id, 0);
-
-    create_test_cart(store, 1);
-
     CU_ASSERT_EQUAL(store->next_cart_id, 1);
 
-    create_test_cart(store, 2);
+    create_test_cart(store, store->next_cart_id);
 
     CU_ASSERT_EQUAL(store->next_cart_id, 2);
+
+    create_test_cart(store, store->next_cart_id);
+
+    CU_ASSERT_EQUAL(store->next_cart_id, 3);
 
     store_destroy(store);
 }

@@ -2,13 +2,6 @@
 #include "merch.h"
 #include "cart.h"
 #include "stock.h"
-#include <stdio.h>
-#include <stdbool.h>
-#include <string.h>
-#include <stdlib.h>
-#include "../data_structures/hash_table.h"
-#include "../data_structures/hash_table_iterator.h"
-#include "../utils/utils.h"
 
 ioopm_hash_table_t *store_stock(store_t *store)
 {
@@ -96,10 +89,10 @@ void store_destroy(store_t *store) {
 store_t *store_create(void) {
   store_t *new_store = calloc(1, sizeof(store_t));
 
-  // TODO: lägg till resten av ht's också.
   new_store->merchandise = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, merch_destroy_callback);
   new_store->stock = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, shelf_destroy_callback);
   new_store->carts = ioopm_hash_table_create(ioopm_size_t_knr_hash, size_t_compare, cart_destroy_callback);
+  new_store->next_cart_id = 1; // first cart is ID: 1
 
   return new_store;
 }

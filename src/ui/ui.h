@@ -1,6 +1,10 @@
 #pragma once
-#include "../utils/utils.h"
 #include "../backend/store.h"
+#include "../backend/merch.h"
+#include "../backend/stock.h"
+#include "../backend/cart.h"
+#include <stdio.h>
+#include <ctype.h>
 
 /* 
 NOTE: Documentation outline generated with KLAR, then rewritten and verified by Signe von Greiff and Anton Äng.

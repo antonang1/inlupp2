@@ -136,27 +136,33 @@ void test_ioopm_list_head(void)
 /* deepseek */
 void test_ioopm_list_last(void)
 {
-  ioopm_list_t *list = ioopm_list_create(NULL);
+    ioopm_list_t *list = ioopm_list_create(NULL);
 
-  elem_t v1 = {.i = 10};
-  ioopm_list_append(list, v1);
+    elem_t v1 = {.i = 10};
+    ioopm_list_append(list, v1);
 
-  elem_t v2 = {.i = 20};
-  ioopm_list_append(list, v2);
+    elem_t v2 = {.i = 20};
+    ioopm_list_append(list, v2);
 
-  elem_t last = ioopm_list_last(list);
-  CU_ASSERT_EQUAL(last.i, 20);
+    // Test ioopm_list_last
+    elem_t last = ioopm_list_last(list);
+    CU_ASSERT_EQUAL(last.i, 20);
 
-  ioopm_list_iterator_t *it = ioopm_list_iterator_create(list);
-  while (!ioopm_list_iterator_at_end(it))
-  {
-    ioopm_list_iterator_advance(it);
-  }
-  elem_t last2 = ioopm_list_iterator_current(it);
-  CU_ASSERT_EQUAL(last2.i, 20);
+    // Test iterator
+    ioopm_list_iterator_t *it = ioopm_list_iterator_create(list);
 
-  ioopm_list_iterator_destroy(it);
-  ioopm_list_destroy(list);
+    elem_t last2 = {0};
+
+    while (!ioopm_list_iterator_at_end(it))
+    {
+        last2 = ioopm_list_iterator_current(it);
+        ioopm_list_iterator_advance(it);
+    }
+
+    CU_ASSERT_EQUAL(last2.i, 20);
+
+    ioopm_list_iterator_destroy(it);
+    ioopm_list_destroy(list);
 }
 
 /* deepseek */
