@@ -3,6 +3,11 @@
 Simple webstore backend with a text user interface, built on the data
 structures from assignment 1.
 
+## USE OF AI
+
+This README was written drafted loosly with the help of KLAR in order to structure and phrase the text. The draft was then
+rewritten and reviewed by Signe von Greiff and Anton Äng to accuratley describe the code written. After the README was completed, KLAR was used to spellcheck the text without rewriting any of the text.   
+
 ## Building and running the tests
 
 make test
@@ -35,8 +40,7 @@ The user interface is not covered by the unit tests.
 
 The program is built and started with:
 
-make compile_main 
-valgrind./main
+make convert_merch ??? OSÄKER HÄR 
 
 It enters an event loop and reads one action code at a time from
 standard input. A confirmation is asked for before anything is removed
@@ -66,9 +70,10 @@ line, in the order given above. The format is checked as soon as the
 data has been read, and on bad input the program asks for that value
 again.
 
-The program can be driven from a file instead of by hand:
+## Testing the interface
 
-webstoretest.txt 
+The course supplies a script that runs through every action:
+webstoretest.txt. 
 
 ## Module layout
 
@@ -93,7 +98,6 @@ from more than one person.
 | Hash table  | assignment 1, Anton          |
 | Linked list | assignment 1, Anton          |
 | Utils       | bootstrap labs, Signe        |
-
 
 ## Code coverage
 
@@ -132,13 +136,13 @@ to destroy three tables. Each table is created with a callback for its
 value type, which frees the value and what that value owns.
 
 Second, ioopm_hash_table_remove was changed so that it writes the
-removed value to its out-parameter, instead of only reporting that
+removed value to its out-parameter instead of only reporting that
 something was removed. That is needed in the places where the value is
 used afterwards, for example when an item is renamed and has to be
 inserted under its new key.
 
 The linked list also gained a destroy function. It is in place but not
-fully used yet, because every storage location is owned by the store and
+fully used yet because every storage location is owned by the store and
 is freed through the store's own callback. It stays so that the list
 remains complete as a generic data structure.
 
@@ -169,7 +173,7 @@ location to what is stored on it.
 
 The price of that design is that the two must be kept in sync, and this
 shows most clearly on a rename. When an item is renamed it is moved in
-merchandise by being extracted and inserted anew, and after that the new
+merchandise by being extracted and inserted again, and after that the new
 name is copied out onto every storage location holding the item. Forget
 the second half and the storage location points at a name that no longer
 exists in the store.

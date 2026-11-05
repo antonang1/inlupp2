@@ -4,6 +4,11 @@
 #include "../data_structures/linked_list.h"
 #include "store.h"
 
+/* 
+NOTE: Documentation outline generated with KLAR, then rewritten and verified by Signe von Greiff and Anton Äng.
+No code in this repository was generated.
+*/
+
 typedef struct merch merch_t;
 
 struct merch

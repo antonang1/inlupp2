@@ -5,6 +5,11 @@
 #include "store.h"
 #include "merch.h" 
 
+/* 
+NOTE: Documentation outline generated with KLAR, then rewritten and verified by Signe von Greiff and Anton Äng.
+No code in this repository was generated.
+*/
+
 typedef struct cart cart_t;
 
 struct cart

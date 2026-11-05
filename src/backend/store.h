@@ -2,6 +2,10 @@
 
 #include "../data_structures/hash_table.h"
 
+/* 
+NOTE: Documentation outline generated with KLAR, then rewritten and verified by Signe von Greiff and Anton Äng.
+No code in this repository was generated.
+*/
 
 typedef struct store store_t;
 

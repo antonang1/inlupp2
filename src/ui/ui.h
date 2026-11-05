@@ -2,6 +2,10 @@
 #include "../utils/utils.h"
 #include "../backend/store.h"
 
+/* 
+NOTE: Documentation outline generated with KLAR, then rewritten and verified by Signe von Greiff and Anton Äng.
+No code in this repository was generated.
+*/
 
 /// @brief Runs the menu loop, executing the user's chosen command until
 ///        the user chooses to quit.
