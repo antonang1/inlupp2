@@ -3,11 +3,11 @@
 
 int main(void)
 {
-    store_t *store = store_create();
+    store_t *store = ioopm_store_create();
 
     event_loop(store);
     
-   return store_quit(store);
+   return ioopm_store_quit(store);
 
 
 }

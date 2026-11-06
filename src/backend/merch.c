@@ -2,12 +2,12 @@
 #include "store.h"
 #include "stock.h"
 
-ioopm_list_t *merch_shelves(merch_t *merch)
+ioopm_list_t *ioopm_merch_shelves(merch_t *merch)
 {
     return merch->shelfs;
 }
 
-int merch_price(merch_t *merch)
+int ioopm_merch_price(merch_t *merch)
 {
     return merch->price;
 }
@@ -16,12 +16,12 @@ int merch_price(merch_t *merch)
 // negative outcome: a before b
 // zero: equal
 // positive: a after b
-int comparison_merch(elem_t a, elem_t b)
+int ioopm_comparison_merch(elem_t a, elem_t b)
 {
     return strcmp(a.s, b.s);
 }
 
-void merch_destroy(merch_t *merch)
+void ioopm_merch_destroy(merch_t *merch)
 {    
     if (merch == NULL)
     {
@@ -41,7 +41,7 @@ void merch_destroy(merch_t *merch)
     return;
 }
 
-merch_t *merch_create(const char *name, const char *desc, size_t price)
+merch_t *ioopm_merch_create(const char *name, const char *desc, size_t price)
 {
     merch_t *new_merch = calloc(1, sizeof(merch_t));
 
@@ -53,7 +53,7 @@ merch_t *merch_create(const char *name, const char *desc, size_t price)
 }
 
 // 2.1.1 Add Merchandise
-bool merch_add_to_store(store_t *store, char *name, char *desc, size_t price)
+bool ioopm_merch_add_to_store(store_t *store, char *name, char *desc, size_t price)
 {  
     if (store == NULL)
     {
@@ -66,7 +66,7 @@ bool merch_add_to_store(store_t *store, char *name, char *desc, size_t price)
         return false;
     }
 
-    merch_t *new_merch = merch_create(name, desc, price);
+    merch_t *new_merch = ioopm_merch_create(name, desc, price);
     ioopm_hash_table_insert(store->merchandise, string_elem(new_merch->name), ptr_elem(new_merch));
     
     return true;
@@ -74,7 +74,7 @@ bool merch_add_to_store(store_t *store, char *name, char *desc, size_t price)
 }
 
 // 2.1.3 Remove Merchandise
-bool merch_remove_from_store(store_t *store, char *merch_name)
+bool ioopm_merch_remove_from_store(store_t *store, char *merch_name)
 {
     elem_t merch_of_intrest;
     if (!ioopm_hash_table_lookup(store->merchandise, string_elem(merch_name), &merch_of_intrest))
@@ -86,7 +86,7 @@ bool merch_remove_from_store(store_t *store, char *merch_name)
 
     if (merch->shelfs != NULL)
     {
-        stock_remove_merch(store, merch); // merch apperance in stock needs to be removed aswell
+        ioopm_stock_remove_merch(store, merch); // merch apperance in stock needs to be removed aswell
     }
 
     ioopm_hash_table_remove(store->merchandise, string_elem(merch_name), &merch_of_intrest);    // then we destroy the merch
@@ -96,7 +96,7 @@ bool merch_remove_from_store(store_t *store, char *merch_name)
 
 
 // 2.1.4 Edit Merchandise
-bool merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, size_t new_price)
+bool ioopm_merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, size_t new_price)
 {
     if (new_name == NULL)
     {
@@ -148,7 +148,7 @@ bool merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, 
     // if merch has locations, their info needs to be updated to new name aswell.
     if (merch_update->shelfs != NULL)
     {
-        stock_update_merch_name(merch_update);
+        ioopm_stock_update_merch_name(merch_update);
     }
     
     return true;
@@ -156,7 +156,7 @@ bool merch_edit(store_t *store, char *old_name, char *new_name, char *new_desc, 
 
 // This function does not have ownership over the memeory allocated
 // ui.c does when calling this function!!! 
-elem_t *list_merchandise(store_t *store, size_t *size_out)
+elem_t *ioopm_list_merchandise(store_t *store, size_t *size_out)
 {
     *size_out = ioopm_hash_table_size(store->merchandise);
     elem_t *merch = calloc(*size_out, sizeof(elem_t));
@@ -173,7 +173,7 @@ elem_t *list_merchandise(store_t *store, size_t *size_out)
     }
 
     ioopm_hash_table_iterator_destroy(iter);
-    insertion_sort(merch, *size_out, comparison_merch);
+    insertion_sort(merch, *size_out, ioopm_comparison_merch);
 
     return merch;
 }

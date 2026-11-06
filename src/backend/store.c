@@ -3,12 +3,12 @@
 #include "cart.h"
 #include "stock.h"
 
-ioopm_hash_table_t *store_stock(store_t *store)
+ioopm_hash_table_t *ioopm_store_stock(store_t *store)
 {
     return store->stock;
 }
 
-ioopm_hash_table_t *store_merchandise(store_t *store)
+ioopm_hash_table_t *ioopm_store_merchandise(store_t *store)
 {
     return store->merchandise;
 }
@@ -72,7 +72,7 @@ static void cart_destroy_callback(elem_t value)
 }
 
 
-void store_destroy(store_t *store) {
+void ioopm_store_destroy(store_t *store) {
   if (store == NULL)
   {
     return;
@@ -86,7 +86,7 @@ void store_destroy(store_t *store) {
 
 }
 
-store_t *store_create(void) {
+store_t *ioopm_store_create(void) {
   store_t *new_store = calloc(1, sizeof(store_t));
 
   new_store->merchandise = ioopm_hash_table_create(ioopm_string_knr_hash, string_compare, merch_destroy_callback);
@@ -97,9 +97,9 @@ store_t *store_create(void) {
   return new_store;
 }
 
-int store_quit(store_t *store)
+int ioopm_store_quit(store_t *store)
 {
-  store_destroy(store);
+  ioopm_store_destroy(store);
   
   return 1;
 }

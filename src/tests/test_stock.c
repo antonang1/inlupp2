@@ -23,7 +23,7 @@ int clean_suite(void) { return 0; }
 // -------------- TESTS shelf_create --------------
 void test_shelf_create(void)
 {
-    shelf_t *shelf = shelf_create("A10", "Apple");
+    shelf_t *shelf = ioopm_shelf_create("A10", "Apple");
 
     CU_ASSERT_PTR_NOT_NULL(shelf);
     CU_ASSERT_PTR_NOT_NULL(shelf->shelf_name);
@@ -39,7 +39,7 @@ void test_shelf_create(void)
 void test_shelf_create_copies_strings(void)
 {
     char label[] = "A10";
-    shelf_t *shelf = shelf_create(label, "Apple");
+    shelf_t *shelf = ioopm_shelf_create(label, "Apple");
     
     // Mutate the caller's buffer; the shelf must be unaffected
     label[0] = 'X';
@@ -55,7 +55,7 @@ void test_comparison_shelf_equal(void)
 {
     elem_t a = string_elem("A10");
     elem_t b = string_elem("A10");
-    CU_ASSERT_EQUAL(comparison_shelf(a, b), 0);
+    CU_ASSERT_EQUAL(ioopm_comparison_shelf(a, b), 0);
 }
 
 void test_comparison_shelf_order(void)
@@ -63,17 +63,17 @@ void test_comparison_shelf_order(void)
     elem_t a = string_elem("A10");
     elem_t b = string_elem("B12");
     
-    CU_ASSERT_TRUE(comparison_shelf(a, b) < 0);
-    CU_ASSERT_TRUE(comparison_shelf(b, a) > 0);
+    CU_ASSERT_TRUE(ioopm_comparison_shelf(a, b) < 0);
+    CU_ASSERT_TRUE(ioopm_comparison_shelf(b, a) > 0);
 }
 
 // -------------- TESTS replenish_stock --------------
 void test_replenish_new_shelf(void)
 {
-    store_t *store = store_create();
-    CU_ASSERT_TRUE(merch_add_to_store(store, "Apple", "Red apple", 10));
+    store_t *store = ioopm_store_create();
+    CU_ASSERT_TRUE(ioopm_merch_add_to_store(store, "Apple", "Red apple", 10));
     
-    CU_ASSERT_TRUE(replenish_stock(store, "A10", "Apple", 7));
+    CU_ASSERT_TRUE(ioopm_replenish_stock(store, "A10", "Apple", 7));
     
     elem_t result;
     CU_ASSERT_TRUE(ioopm_hash_table_lookup(store->stock, string_elem("A10"), &result));
@@ -83,14 +83,14 @@ void test_replenish_new_shelf(void)
     CU_ASSERT_STRING_EQUAL(shelf->merch_name, "Apple");
     CU_ASSERT_EQUAL(shelf->quantity, 7);
     
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_replenish_aliases_into_merch_list(void)
 {
-    store_t *store = store_create();
-    merch_add_to_store(store, "Apple", "Red apple", 10);
-    replenish_stock(store, "A10", "Apple", 7);
+    store_t *store = ioopm_store_create();
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
+    ioopm_replenish_stock(store, "A10", "Apple", 7);
     
     // The empty file is built up by the course backend. Verify the test
     elem_t merch_result;
@@ -108,16 +108,16 @@ void test_replenish_aliases_into_merch_list(void)
     
     CU_ASSERT_PTR_EQUAL(from_stock, from_list);
     
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_replenish_existing_shelf_adds_quantity(void)
 {
-    store_t *store = store_create();
-    merch_add_to_store(store, "Apple", "Red apple", 10);
+    store_t *store = ioopm_store_create();
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
     
-    CU_ASSERT_TRUE(replenish_stock(store, "A10", "Apple", 7));
-    CU_ASSERT_TRUE(replenish_stock(store, "A10", "Apple", 5));
+    CU_ASSERT_TRUE(ioopm_replenish_stock(store, "A10", "Apple", 7));
+    CU_ASSERT_TRUE(ioopm_replenish_stock(store, "A10", "Apple", 5));
     
     elem_t result;
     ioopm_hash_table_lookup(store->stock, string_elem("A10"), &result);
@@ -131,32 +131,32 @@ void test_replenish_existing_shelf_adds_quantity(void)
     merch_t *merch = merch_result.p;
     CU_ASSERT_EQUAL(ioopm_list_size(merch->shelfs), 1);
     
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_replenish_nonexisting_merch(void)
 {
-    store_t *store = store_create();
+    store_t *store = ioopm_store_create();
     
-    CU_ASSERT_FALSE(replenish_stock(store, "A10", "Apple", 7));
+    CU_ASSERT_FALSE(ioopm_replenish_stock(store, "A10", "Apple", 7));
     
     // Nothing may be inserted into stock
     elem_t result;
     CU_ASSERT_FALSE(ioopm_hash_table_lookup(store->stock, string_elem("A10"), &result));
     
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_replenish_shelf_occupied_by_other_merch(void)
 {
-    store_t *store = store_create();
-    merch_add_to_store(store, "Apple", "Red apple", 10);
-    merch_add_to_store(store, "Pear", "Green pear", 15);
+    store_t *store = ioopm_store_create();
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
+    ioopm_merch_add_to_store(store, "Pear", "Green pear", 15);
     
-    CU_ASSERT_TRUE(replenish_stock(store, "A10", "Apple", 7));
+    CU_ASSERT_TRUE(ioopm_replenish_stock(store, "A10", "Apple", 7));
     
     // A10 already holds Apple, so it cannot hold Pear
-    CU_ASSERT_FALSE(replenish_stock(store, "A10", "Pear", 3));
+    CU_ASSERT_FALSE(ioopm_replenish_stock(store, "A10", "Pear", 3));
     
     elem_t result;
     ioopm_hash_table_lookup(store->stock, string_elem("A10"), &result);
@@ -165,38 +165,38 @@ void test_replenish_shelf_occupied_by_other_merch(void)
     CU_ASSERT_STRING_EQUAL(shelf->merch_name, "Apple");
     CU_ASSERT_EQUAL(shelf->quantity, 7);
     
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_replenish_zero_quantity(void)
 {
-    store_t *store = store_create();
-    merch_add_to_store(store, "Apple", "Red apple", 10);
+    store_t *store = ioopm_store_create();
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
     
-    CU_ASSERT_FALSE(replenish_stock(store, "A10", "Apple", 0));
+    CU_ASSERT_FALSE(ioopm_replenish_stock(store, "A10", "Apple", 0));
     
     elem_t result;
     CU_ASSERT_FALSE(ioopm_hash_table_lookup(store->stock, string_elem("A10"), &result));
     
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 // -------------- TESTS list_shelves --------------
 void test_list_shelves_sorted(void)
 {
-    store_t *store = store_create();
-    merch_add_to_store(store, "Apple", "Red apple", 10);
+    store_t *store = ioopm_store_create();
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
     
-    replenish_stock(store, "C30", "Apple", 1);
-    replenish_stock(store, "A10", "Apple", 1);
-    replenish_stock(store, "B20", "Apple", 1);
+    ioopm_replenish_stock(store, "C30", "Apple", 1);
+    ioopm_replenish_stock(store, "A10", "Apple", 1);
+    ioopm_replenish_stock(store, "B20", "Apple", 1);
     
     elem_t merch_result;
     ioopm_hash_table_lookup(store->merchandise, string_elem("Apple"), &merch_result);
     merch_t *merch = merch_result.p;
     
     size_t size = 0;
-    elem_t *shelves = list_shelves(merch, &size);
+    elem_t *shelves = ioopm_list_shelves(merch, &size);
     
     CU_ASSERT_EQUAL(size, 3);
     
@@ -205,87 +205,87 @@ void test_list_shelves_sorted(void)
     CU_ASSERT_STRING_EQUAL(shelves[2].s, "C30");
     
     free(shelves);
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_list_shelves_single(void)
 {
-    store_t *store = store_create();
-    merch_add_to_store(store, "Apple", "Red apple", 10);
-    replenish_stock(store, "A10", "Apple", 4);
+    store_t *store = ioopm_store_create();
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
+    ioopm_replenish_stock(store, "A10", "Apple", 4);
 
     elem_t merch_result;
     ioopm_hash_table_lookup(store->merchandise, string_elem("Apple"), &merch_result);
     merch_t *merch = merch_result.p;
 
     size_t size = 0;
-    elem_t *shelves = list_shelves(merch, &size);
+    elem_t *shelves = ioopm_list_shelves(merch, &size);
 
     CU_ASSERT_EQUAL(size, 1);
     CU_ASSERT_STRING_EQUAL(shelves[0].s, "A10");
 
     free(shelves);
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 // -------------- TESTS stock_remove_merch --------------
 void test_stock_remove_merch(void)
 {
-    store_t *store = store_create();
-    merch_add_to_store(store, "Apple", "Red apple", 10);
+    store_t *store = ioopm_store_create();
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
 
-    replenish_stock(store, "A10", "Apple", 3);
-    replenish_stock(store, "B20", "Apple", 5);
+    ioopm_replenish_stock(store, "A10", "Apple", 3);
+    ioopm_replenish_stock(store, "B20", "Apple", 5);
 
     elem_t merch_result;
     ioopm_hash_table_lookup(store->merchandise, string_elem("Apple"), &merch_result);
     merch_t *merch = merch_result.p;
 
-    CU_ASSERT_TRUE(stock_remove_merch(store, merch));
+    CU_ASSERT_TRUE(ioopm_stock_remove_merch(store, merch));
 
     elem_t result;
     CU_ASSERT_FALSE(ioopm_hash_table_lookup(store->stock, string_elem("A10"), &result));
     CU_ASSERT_FALSE(ioopm_hash_table_lookup(store->stock, string_elem("B20"), &result));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_stock_remove_merch_leaves_other_merch(void)
 {
-    store_t *store = store_create();
-    merch_add_to_store(store, "Apple", "Red apple", 10);
-    merch_add_to_store(store, "Pear", "Green pear", 15);
+    store_t *store = ioopm_store_create();
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
+    ioopm_merch_add_to_store(store, "Pear", "Green pear", 15);
 
-    replenish_stock(store, "A10", "Apple", 3);
-    replenish_stock(store, "B20", "Pear", 4);
+    ioopm_replenish_stock(store, "A10", "Apple", 3);
+    ioopm_replenish_stock(store, "B20", "Pear", 4);
 
     elem_t merch_result;
     ioopm_hash_table_lookup(store->merchandise, string_elem("Apple"), &merch_result);
     merch_t *apple = merch_result.p;
 
-    CU_ASSERT_TRUE(stock_remove_merch(store, apple));
+    CU_ASSERT_TRUE(ioopm_stock_remove_merch(store, apple));
 
     elem_t result;
     CU_ASSERT_FALSE(ioopm_hash_table_lookup(store->stock, string_elem("A10"), &result));
     CU_ASSERT_TRUE(ioopm_hash_table_lookup(store->stock, string_elem("B20"), &result));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 // -------------- TESTS stock_update_merch_name --------------
 void test_stock_update_merch_name(void)
 {
-    store_t *store = store_create();
-    merch_add_to_store(store, "Apple", "Red apple", 10);
+    store_t *store = ioopm_store_create();
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
 
-    replenish_stock(store, "A10", "Apple", 3);
-    replenish_stock(store, "B20", "Apple", 5);
+    ioopm_replenish_stock(store, "A10", "Apple", 3);
+    ioopm_replenish_stock(store, "B20", "Apple", 5);
 
     elem_t merch_result;
     ioopm_hash_table_lookup(store->merchandise, string_elem("Apple"), &merch_result);
 
     // Rename through the public edit function
-    CU_ASSERT_TRUE(merch_edit(store, "Apple", "GreenApple", "Green apple", 12));
+    CU_ASSERT_TRUE(ioopm_merch_edit(store, "Apple", "GreenApple", "Green apple", 12));
 
     elem_t shelf_result;
     ioopm_hash_table_lookup(store->stock, string_elem("A10"), &shelf_result);
@@ -294,60 +294,60 @@ void test_stock_update_merch_name(void)
     ioopm_hash_table_lookup(store->stock, string_elem("B20"), &shelf_result);
     CU_ASSERT_STRING_EQUAL(((shelf_t *) shelf_result.p)->merch_name, "GreenApple");
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 // -------------- TESTS get_total_stock --------------
 void test_get_total_stock_empty_merch(void)
 {
-    store_t *store = store_create();
-    merch_add_to_store(store, "Apple", "Red apple", 10);
+    store_t *store = ioopm_store_create();
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
 
     elem_t merch_result;
     ioopm_hash_table_lookup(store->merchandise, string_elem("Apple"), &merch_result);
     merch_t *merch = merch_result.p;
 
     // No shelves yet, so the total must be zero
-    CU_ASSERT_EQUAL(get_total_stock(merch), 0);
+    CU_ASSERT_EQUAL(ioopm_get_total_stock(merch), 0);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_get_total_stock_sums_shelves(void)
 {
-    store_t *store = store_create();
-    merch_add_to_store(store, "Apple", "Red apple", 10);
+    store_t *store = ioopm_store_create();
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
 
-    replenish_stock(store, "A10", "Apple", 3);
-    replenish_stock(store, "B20", "Apple", 5);
-    replenish_stock(store, "C30", "Apple", 2);
+    ioopm_replenish_stock(store, "A10", "Apple", 3);
+    ioopm_replenish_stock(store, "B20", "Apple", 5);
+    ioopm_replenish_stock(store, "C30", "Apple", 2);
 
     elem_t merch_result;
     ioopm_hash_table_lookup(store->merchandise, string_elem("Apple"), &merch_result);
     merch_t *merch = merch_result.p;
 
-    CU_ASSERT_EQUAL(get_total_stock(merch), 10);
+    CU_ASSERT_EQUAL(ioopm_get_total_stock(merch), 10);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_get_total_stock_ignores_other_merch(void)
 {
-    store_t *store = store_create();
-    merch_add_to_store(store, "Apple", "Red apple", 10);
-    merch_add_to_store(store, "Pear", "Green pear", 15);
+    store_t *store = ioopm_store_create();
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
+    ioopm_merch_add_to_store(store, "Pear", "Green pear", 15);
 
-    replenish_stock(store, "A10", "Apple", 3);
-    replenish_stock(store, "B20", "Pear", 7);
+    ioopm_replenish_stock(store, "A10", "Apple", 3);
+    ioopm_replenish_stock(store, "B20", "Pear", 7);
 
     elem_t merch_result;
     ioopm_hash_table_lookup(store->merchandise, string_elem("Apple"), &merch_result);
     merch_t *apple = merch_result.p;
 
     // Pear's shelf must not be counted into Apple's total
-    CU_ASSERT_EQUAL(get_total_stock(apple), 3);
+    CU_ASSERT_EQUAL(ioopm_get_total_stock(apple), 3);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 int main()

@@ -27,21 +27,21 @@ int clean_suite(void) { return 0; }
 
 static store_t *create_test_store(void)
 {
-    store_t *store = store_create();
+    store_t *store = ioopm_store_create();
 
-    merch_add_to_store(store, "Apple", "Red apple", 10);
-    merch_add_to_store(store, "Banana", "Yellow banana", 5);
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
+    ioopm_merch_add_to_store(store, "Banana", "Yellow banana", 5);
 
-    replenish_stock(store, "A10", "Apple", 10);
-    replenish_stock(store, "B20", "Banana", 10);
+    ioopm_replenish_stock(store, "A10", "Apple", 10);
+    ioopm_replenish_stock(store, "B20", "Banana", 10);
 
     return store;
 }
 
 static void create_test_cart(store_t *store, size_t id)
 {
-    cart_t *cart = cart_create(id);
-    add_cart_to_store(store, cart);
+    cart_t *cart = ioopm_cart_create(id);
+    ioopm_add_cart_to_store(store, cart);
 }
 
 static merch_t *get_merch(store_t *store, char *name)
@@ -73,7 +73,7 @@ static shelf_t *get_shelf(store_t *store, char *name)
 
 void test_cart_create(void)
 {
-    cart_t *cart = cart_create(1);
+    cart_t *cart = ioopm_cart_create(1);
 
     CU_ASSERT_PTR_NOT_NULL(cart);
 
@@ -90,8 +90,8 @@ void test_cart_create(void)
 
 void test_cart_create_different_ids(void)
 {
-    cart_t *cart1 = cart_create(1);
-    cart_t *cart2 = cart_create(2);
+    cart_t *cart1 = ioopm_cart_create(1);
+    cart_t *cart2 = ioopm_cart_create(2);
 
     CU_ASSERT_PTR_NOT_NULL(cart1);
     CU_ASSERT_PTR_NOT_NULL(cart2);
@@ -119,7 +119,7 @@ void test_cart_create_different_ids(void)
 
 void test_add_cart_to_store(void)
 {
-    store_t *store = store_create();
+    store_t *store = ioopm_store_create();
 
     create_test_cart(store, 1);
 
@@ -131,12 +131,12 @@ void test_add_cart_to_store(void)
 
     CU_ASSERT_EQUAL(cart->id, 1);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_add_cart_to_store_increments_next_id(void)
 {
-    store_t *store = store_create();
+    store_t *store = ioopm_store_create();
 
     CU_ASSERT_EQUAL(store->next_cart_id, 1);
 
@@ -148,7 +148,7 @@ void test_add_cart_to_store_increments_next_id(void)
 
     CU_ASSERT_EQUAL(store->next_cart_id, 3);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 
@@ -161,9 +161,9 @@ void test_get_occupied_stock_empty_carts(void)
 
     merch_t *apple = get_merch(store, "Apple");
 
-    CU_ASSERT_EQUAL(get_occupied_stock(store, apple), 0);
+    CU_ASSERT_EQUAL(ioopm_get_occupied_stock(store, apple), 0);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_get_occupied_stock_one_cart(void)
@@ -171,13 +171,13 @@ void test_get_occupied_stock_one_cart(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 4));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 4));
 
     merch_t *apple = get_merch(store, "Apple");
 
-    CU_ASSERT_EQUAL(get_occupied_stock(store, apple), 4);
+    CU_ASSERT_EQUAL(ioopm_get_occupied_stock(store, apple), 4);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_get_occupied_stock_multiple_carts(void)
@@ -187,14 +187,14 @@ void test_get_occupied_stock_multiple_carts(void)
     create_test_cart(store, 1);
     create_test_cart(store, 2);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 3));
-    CU_ASSERT_TRUE(add_to_cart(store, 2, "Apple", 4));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 3));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 2, "Apple", 4));
 
     merch_t *apple = get_merch(store, "Apple");
 
-    CU_ASSERT_EQUAL(get_occupied_stock(store, apple), 7);
+    CU_ASSERT_EQUAL(ioopm_get_occupied_stock(store, apple), 7);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_get_occupied_stock_ignores_other_merch(void)
@@ -203,14 +203,14 @@ void test_get_occupied_stock_ignores_other_merch(void)
 
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 3));
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Banana", 5));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 3));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Banana", 5));
 
     merch_t *apple = get_merch(store, "Apple");
 
-    CU_ASSERT_EQUAL(get_occupied_stock(store, apple), 3);
+    CU_ASSERT_EQUAL(ioopm_get_occupied_stock(store, apple), 3);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 
@@ -221,7 +221,7 @@ void test_add_to_cart(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 3));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 3));
 
     elem_t result;
     ioopm_hash_table_lookup(store->carts, int_elem(1), &result);
@@ -234,7 +234,7 @@ void test_add_to_cart(void)
 
     CU_ASSERT_EQUAL(quantity.i, 3);
 
-    store_destroy(store);
+   ioopm_store_destroy(store);
 }
 
 void test_add_same_item_twice(void)
@@ -242,8 +242,8 @@ void test_add_same_item_twice(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 2));
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 3));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 2));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 3));
 
     elem_t result;
     ioopm_hash_table_lookup(store->carts, int_elem(1), &result);
@@ -256,7 +256,7 @@ void test_add_same_item_twice(void)
 
     CU_ASSERT_EQUAL(quantity.i, 5);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_add_different_items_to_cart(void)
@@ -264,8 +264,8 @@ void test_add_different_items_to_cart(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 2));
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Banana", 4));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 2));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Banana", 4));
 
     elem_t result;
     ioopm_hash_table_lookup(store->carts, int_elem(1), &result);
@@ -284,16 +284,16 @@ void test_add_different_items_to_cart(void)
 
     CU_ASSERT_EQUAL(ioopm_hash_table_size(cart->items), 2);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_add_to_nonexistent_cart(void)
 {
     store_t *store = create_test_store();
 
-    CU_ASSERT_FALSE(add_to_cart(store, 99, "Apple", 1));
+    CU_ASSERT_FALSE(ioopm_add_to_cart(store, 99, "Apple", 1));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_add_nonexistent_merchandise(void)
@@ -301,9 +301,9 @@ void test_add_nonexistent_merchandise(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_FALSE(add_to_cart(store, 1, "Pineapple", 1));
+    CU_ASSERT_FALSE(ioopm_add_to_cart(store, 1, "Pineapple", 1));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_add_more_than_total_stock(void)
@@ -311,9 +311,9 @@ void test_add_more_than_total_stock(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_FALSE(add_to_cart(store, 1, "Apple", 11));
+    CU_ASSERT_FALSE(ioopm_add_to_cart(store, 1, "Apple", 11));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_add_zero_quantity(void)
@@ -322,9 +322,9 @@ void test_add_zero_quantity(void)
     create_test_cart(store, 1);
 
     // Expected behaviour: zero quantity should not be added.
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 0));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 0));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 
@@ -337,17 +337,17 @@ void test_reserve_stock_across_multiple_carts(void)
     create_test_cart(store, 1);
     create_test_cart(store, 2);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 6));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 6));
 
     // Only four apples remain available.
-    CU_ASSERT_FALSE(add_to_cart(store, 2, "Apple", 5));
-    CU_ASSERT_TRUE(add_to_cart(store, 2, "Apple", 4));
+    CU_ASSERT_FALSE(ioopm_add_to_cart(store, 2, "Apple", 5));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 2, "Apple", 4));
 
     merch_t *apple = get_merch(store, "Apple");
 
-    CU_ASSERT_EQUAL(get_occupied_stock(store, apple), 10);
+    CU_ASSERT_EQUAL(ioopm_get_occupied_stock(store, apple), 10);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_reserve_stock_same_cart_multiple_times(void)
@@ -355,16 +355,16 @@ void test_reserve_stock_same_cart_multiple_times(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 4));
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 6));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 4));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 6));
 
-    CU_ASSERT_FALSE(add_to_cart(store, 1, "Apple", 1));
+    CU_ASSERT_FALSE(ioopm_add_to_cart(store, 1, "Apple", 1));
 
     merch_t *apple = get_merch(store, "Apple");
 
-    CU_ASSERT_EQUAL(get_occupied_stock(store, apple), 10);
+    CU_ASSERT_EQUAL(ioopm_get_occupied_stock(store, apple), 10);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_reserve_stock_different_merchandise(void)
@@ -374,16 +374,16 @@ void test_reserve_stock_different_merchandise(void)
     create_test_cart(store, 1);
     create_test_cart(store, 2);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 10));
-    CU_ASSERT_TRUE(add_to_cart(store, 2, "Banana", 10));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 10));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 2, "Banana", 10));
 
     merch_t *apple = get_merch(store, "Apple");
     merch_t *banana = get_merch(store, "Banana");
 
-    CU_ASSERT_EQUAL(get_occupied_stock(store, apple), 10);
-    CU_ASSERT_EQUAL(get_occupied_stock(store, banana), 10);
+    CU_ASSERT_EQUAL(ioopm_get_occupied_stock(store, apple), 10);
+    CU_ASSERT_EQUAL(ioopm_get_occupied_stock(store, banana), 10);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 
@@ -394,21 +394,21 @@ void test_remove_cart(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(remove_cart(store, 1));
+    CU_ASSERT_TRUE(ioopm_remove_cart(store, 1));
 
     CU_ASSERT_FALSE(ioopm_hash_table_has_key(
         store->carts, int_elem(1)));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_remove_nonexistent_cart(void)
 {
     store_t *store = create_test_store();
 
-    CU_ASSERT_FALSE(remove_cart(store, 99));
+    CU_ASSERT_FALSE(ioopm_remove_cart(store, 99));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_remove_cart_releases_stock_reservation(void)
@@ -418,19 +418,19 @@ void test_remove_cart_releases_stock_reservation(void)
     create_test_cart(store, 1);
     create_test_cart(store, 2);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 6));
-    CU_ASSERT_TRUE(add_to_cart(store, 2, "Apple", 4));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 6));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 2, "Apple", 4));
 
-    CU_ASSERT_TRUE(remove_cart(store, 1));
+    CU_ASSERT_TRUE(ioopm_remove_cart(store, 1));
 
     // The six apples reserved by cart 1 are now available.
-    CU_ASSERT_TRUE(add_to_cart(store, 2, "Apple", 6));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 2, "Apple", 6));
 
     merch_t *apple = get_merch(store, "Apple");
 
-    CU_ASSERT_EQUAL(get_occupied_stock(store, apple), 10);
+    CU_ASSERT_EQUAL(ioopm_get_occupied_stock(store, apple), 10);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 
@@ -441,8 +441,8 @@ void test_remove_from_cart_partial_quantity(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 5));
-    CU_ASSERT_TRUE(remove_from_cart(store, 1, "Apple", 2));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 5));
+    CU_ASSERT_TRUE(ioopm_remove_from_cart(store, 1, "Apple", 2));
 
     elem_t result;
     ioopm_hash_table_lookup(store->carts, int_elem(1), &result);
@@ -455,7 +455,7 @@ void test_remove_from_cart_partial_quantity(void)
 
     CU_ASSERT_EQUAL(quantity.i, 3);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_remove_from_cart_all_quantity(void)
@@ -463,8 +463,8 @@ void test_remove_from_cart_all_quantity(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 5));
-    CU_ASSERT_TRUE(remove_from_cart(store, 1, "Apple", 5));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 5));
+    CU_ASSERT_TRUE(ioopm_remove_from_cart(store, 1, "Apple", 5));
 
     elem_t result;
     ioopm_hash_table_lookup(store->carts, int_elem(1), &result);
@@ -474,7 +474,7 @@ void test_remove_from_cart_all_quantity(void)
     CU_ASSERT_FALSE(ioopm_hash_table_has_key(
         cart->items, string_elem("Apple")));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_remove_more_than_cart_contains(void)
@@ -482,20 +482,20 @@ void test_remove_more_than_cart_contains(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 3));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 3));
 
-    CU_ASSERT_FALSE(remove_from_cart(store, 1, "Apple", 4));
+    CU_ASSERT_FALSE(ioopm_remove_from_cart(store, 1, "Apple", 4));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_remove_from_nonexistent_cart(void)
 {
     store_t *store = create_test_store();
 
-    CU_ASSERT_FALSE(remove_from_cart(store, 99, "Apple", 1));
+    CU_ASSERT_FALSE(ioopm_remove_from_cart(store, 99, "Apple", 1));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_remove_nonexistent_item_from_cart(void)
@@ -503,9 +503,9 @@ void test_remove_nonexistent_item_from_cart(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_FALSE(remove_from_cart(store, 1, "Apple", 1));
+    CU_ASSERT_FALSE(ioopm_remove_from_cart(store, 1, "Apple", 1));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_remove_zero_quantity(void)
@@ -513,10 +513,10 @@ void test_remove_zero_quantity(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 5));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 5));
 
     // Removing zero items should leave the quantity unchanged.
-    CU_ASSERT_TRUE(remove_from_cart(store, 1, "Apple", 0));
+    CU_ASSERT_TRUE(ioopm_remove_from_cart(store, 1, "Apple", 0));
 
     elem_t result;
     ioopm_hash_table_lookup(store->carts, int_elem(1), &result);
@@ -529,7 +529,7 @@ void test_remove_zero_quantity(void)
 
     CU_ASSERT_EQUAL(quantity.i, 5);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 
@@ -540,13 +540,13 @@ void test_calculate_cost(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 2));
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Banana", 3));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 2));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Banana", 3));
 
     // 2 * 10 + 3 * 5 = 35
-    CU_ASSERT_EQUAL(calculate_cost(store, 1), 35);
+    CU_ASSERT_EQUAL(ioopm_calculate_cost(store, 1), 35);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_calculate_cost_empty_cart(void)
@@ -554,18 +554,18 @@ void test_calculate_cost_empty_cart(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_EQUAL(calculate_cost(store, 1), 0);
+    CU_ASSERT_EQUAL(ioopm_calculate_cost(store, 1), 0);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_calculate_cost_nonexistent_cart(void)
 {
     store_t *store = create_test_store();
 
-    CU_ASSERT_EQUAL(calculate_cost(store, 99), 0);
+    CU_ASSERT_EQUAL(ioopm_calculate_cost(store, 99), 0);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_calculate_cost_after_removing_items(void)
@@ -573,15 +573,15 @@ void test_calculate_cost_after_removing_items(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 5));
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Banana", 2));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 5));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Banana", 2));
 
-    CU_ASSERT_TRUE(remove_from_cart(store, 1, "Apple", 3));
+    CU_ASSERT_TRUE(ioopm_remove_from_cart(store, 1, "Apple", 3));
 
     // 2 * 10 + 2 * 5 = 30
-    CU_ASSERT_EQUAL(calculate_cost(store, 1), 30);
+    CU_ASSERT_EQUAL(ioopm_calculate_cost(store, 1), 30);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 
@@ -592,16 +592,16 @@ void test_check_if_all_items_valid(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 5));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 5));
 
     elem_t result;
     ioopm_hash_table_lookup(store->carts, int_elem(1), &result);
 
     cart_t *cart = result.p;
 
-    CU_ASSERT_TRUE(check_if_all_items_valid(store, cart->items));
+    CU_ASSERT_TRUE(ioopm_check_if_all_items_valid(store, cart->items));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_check_if_all_items_valid_empty_cart(void)
@@ -611,10 +611,10 @@ void test_check_if_all_items_valid_empty_cart(void)
     ioopm_hash_table_t *items = ioopm_hash_table_create(
         ioopm_string_knr_hash, string_compare, NULL);
 
-    CU_ASSERT_TRUE(check_if_all_items_valid(store, items));
+    CU_ASSERT_TRUE(ioopm_check_if_all_items_valid(store, items));
 
     ioopm_hash_table_destroy(items);
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_check_if_all_items_valid_null_store(void)
@@ -622,7 +622,7 @@ void test_check_if_all_items_valid_null_store(void)
     ioopm_hash_table_t *items = ioopm_hash_table_create(
         ioopm_string_knr_hash, string_compare, NULL);
 
-    CU_ASSERT_FALSE(check_if_all_items_valid(NULL, items));
+    CU_ASSERT_FALSE(ioopm_check_if_all_items_valid(NULL, items));
 
     ioopm_hash_table_destroy(items);
 }
@@ -631,9 +631,9 @@ void test_check_if_all_items_valid_null_items(void)
 {
     store_t *store = create_test_store();
 
-    CU_ASSERT_FALSE(check_if_all_items_valid(store, NULL));
+    CU_ASSERT_FALSE(ioopm_check_if_all_items_valid(store, NULL));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_check_if_all_items_valid_rejects_unknown_merch(void)
@@ -648,12 +648,12 @@ void test_check_if_all_items_valid_rejects_unknown_merch(void)
     ioopm_hash_table_insert(
         items, string_elem(unknown_name), int_elem(1));
 
-    CU_ASSERT_FALSE(check_if_all_items_valid(store, items));
+    CU_ASSERT_FALSE(ioopm_check_if_all_items_valid(store, items));
 
     ioopm_hash_table_destroy(items);
     free(unknown_name);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_check_if_all_items_valid_rejects_excess_quantity(void)
@@ -668,12 +668,12 @@ void test_check_if_all_items_valid_rejects_excess_quantity(void)
     ioopm_hash_table_insert(
         items, string_elem(apple_name), int_elem(11));
 
-    CU_ASSERT_FALSE(check_if_all_items_valid(store, items));
+    CU_ASSERT_FALSE(ioopm_check_if_all_items_valid(store, items));
 
     ioopm_hash_table_destroy(items);
     free(apple_name);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 
@@ -684,35 +684,35 @@ void test_checkout_decreases_stock(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 4));
-    CU_ASSERT_TRUE(checkout(store, 1));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 4));
+    CU_ASSERT_TRUE(ioopm_checkout(store, 1));
 
     merch_t *apple = get_merch(store, "Apple");
 
-    CU_ASSERT_EQUAL(get_total_stock(apple), 6);
+    CU_ASSERT_EQUAL(ioopm_get_total_stock(apple), 6);
 
     CU_ASSERT_FALSE(ioopm_hash_table_has_key(
         store->carts, int_elem(1)));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_checkout_removes_empty_shelf(void)
 {
-    store_t *store = store_create();
+    store_t *store = ioopm_store_create();
 
-    merch_add_to_store(store, "Apple", "Red apple", 10);
-    replenish_stock(store, "A10", "Apple", 3);
-    replenish_stock(store, "B20", "Apple", 4);
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
+    ioopm_replenish_stock(store, "A10", "Apple", 3);
+    ioopm_replenish_stock(store, "B20", "Apple", 4);
 
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 3));
-    CU_ASSERT_TRUE(checkout(store, 1));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 3));
+    CU_ASSERT_TRUE(ioopm_checkout(store, 1));
 
     merch_t *apple = get_merch(store, "Apple");
 
-    CU_ASSERT_EQUAL(get_total_stock(apple), 4);
+    CU_ASSERT_EQUAL(ioopm_get_total_stock(apple), 4);
     CU_ASSERT_PTR_NULL(get_shelf(store, "A10"));
 
     shelf_t *shelf = get_shelf(store, "B20");
@@ -724,26 +724,26 @@ void test_checkout_removes_empty_shelf(void)
         CU_ASSERT_EQUAL(shelf->quantity, 4);
     }
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_checkout_across_multiple_shelves(void)
 {
-    store_t *store = store_create();
+    store_t *store = ioopm_store_create();
 
-    merch_add_to_store(store, "Apple", "Red apple", 10);
-    replenish_stock(store, "A10", "Apple", 3);
-    replenish_stock(store, "B20", "Apple", 4);
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
+    ioopm_replenish_stock(store, "A10", "Apple", 3);
+    ioopm_replenish_stock(store, "B20", "Apple", 4);
 
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 5));
-    CU_ASSERT_TRUE(checkout(store, 1));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 5));
+    CU_ASSERT_TRUE(ioopm_checkout(store, 1));
 
     merch_t *apple = get_merch(store, "Apple");
 
     // Five apples consumed from seven total.
-    CU_ASSERT_EQUAL(get_total_stock(apple), 2);
+    CU_ASSERT_EQUAL(ioopm_get_total_stock(apple), 2);
 
     // First shelf should be removed.
     CU_ASSERT_PTR_NULL(get_shelf(store, "A10"));
@@ -758,25 +758,25 @@ void test_checkout_across_multiple_shelves(void)
         CU_ASSERT_EQUAL(shelf->quantity, 2);
     }
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_checkout_exact_shelf_quantity(void)
 {
-    store_t *store = store_create();
+    store_t *store = ioopm_store_create();
 
-    merch_add_to_store(store, "Apple", "Red apple", 10);
-    replenish_stock(store, "A10", "Apple", 3);
-    replenish_stock(store, "B20", "Apple", 4);
+    ioopm_merch_add_to_store(store, "Apple", "Red apple", 10);
+    ioopm_replenish_stock(store, "A10", "Apple", 3);
+    ioopm_replenish_stock(store, "B20", "Apple", 4);
 
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 3));
-    CU_ASSERT_TRUE(checkout(store, 1));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 3));
+    CU_ASSERT_TRUE(ioopm_checkout(store, 1));
 
     merch_t *apple = get_merch(store, "Apple");
 
-    CU_ASSERT_EQUAL(get_total_stock(apple), 4);
+    CU_ASSERT_EQUAL(ioopm_get_total_stock(apple), 4);
     CU_ASSERT_PTR_NULL(get_shelf(store, "A10"));
 
     shelf_t *shelf = get_shelf(store, "B20");
@@ -788,7 +788,7 @@ void test_checkout_exact_shelf_quantity(void)
         CU_ASSERT_EQUAL(shelf->quantity, 4);
     }
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_checkout_multiple_items(void)
@@ -796,18 +796,18 @@ void test_checkout_multiple_items(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Apple", 2));
-    CU_ASSERT_TRUE(add_to_cart(store, 1, "Banana", 3));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Apple", 2));
+    CU_ASSERT_TRUE(ioopm_add_to_cart(store, 1, "Banana", 3));
 
-    CU_ASSERT_TRUE(checkout(store, 1));
+    CU_ASSERT_TRUE(ioopm_checkout(store, 1));
 
-    CU_ASSERT_EQUAL(get_total_stock(get_merch(store, "Apple")), 8);
-    CU_ASSERT_EQUAL(get_total_stock(get_merch(store, "Banana")), 7);
+    CU_ASSERT_EQUAL(ioopm_get_total_stock(get_merch(store, "Apple")), 8);
+    CU_ASSERT_EQUAL(ioopm_get_total_stock(get_merch(store, "Banana")), 7);
 
     CU_ASSERT_FALSE(ioopm_hash_table_has_key(
         store->carts, int_elem(1)));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_checkout_empty_cart(void)
@@ -815,23 +815,23 @@ void test_checkout_empty_cart(void)
     store_t *store = create_test_store();
     create_test_cart(store, 1);
 
-    CU_ASSERT_TRUE(checkout(store, 1));
+    CU_ASSERT_TRUE(ioopm_checkout(store, 1));
 
     CU_ASSERT_FALSE(ioopm_hash_table_has_key(
         store->carts, int_elem(1)));
 
-    CU_ASSERT_EQUAL(get_total_stock(get_merch(store, "Apple")), 10);
+    CU_ASSERT_EQUAL(ioopm_get_total_stock(get_merch(store, "Apple")), 10);
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 void test_checkout_nonexistent_cart(void)
 {
     store_t *store = create_test_store();
 
-    CU_ASSERT_FALSE(checkout(store, 99));
+    CU_ASSERT_FALSE(ioopm_checkout(store, 99));
 
-    store_destroy(store);
+    ioopm_store_destroy(store);
 }
 
 

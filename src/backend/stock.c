@@ -6,7 +6,7 @@
 // negative outcome: a before b
 // zero: equal
 // positive: a after b
-int comparison_shelf(elem_t a, elem_t b)
+int ioopm_comparison_shelf(elem_t a, elem_t b)
 {
     return strcmp(a.s, b.s);
 
@@ -15,7 +15,7 @@ int comparison_shelf(elem_t a, elem_t b)
 // Allocates the struct and a copy of both strings (strdup).
 // The strings are copied, so the caller keeps nothing.
 // Free everything with shelf_destroy.
-shelf_t *shelf_create(const char *shelf, const char *merch_name)
+shelf_t *ioopm_shelf_create(const char *shelf, const char *merch_name)
 {
     shelf_t *new_shelf = calloc(1, sizeof(shelf_t));
     new_shelf->shelf_name = strdup(shelf);
@@ -24,7 +24,7 @@ shelf_t *shelf_create(const char *shelf, const char *merch_name)
     return new_shelf;
 }
 
-bool replenish_stock(store_t *store, char *shelf_name, char *merch_name, size_t quantity)
+bool ioopm_replenish_stock(store_t *store, char *shelf_name, char *merch_name, size_t quantity)
 {
     if (quantity < (size_t) 1)
     {
@@ -57,7 +57,7 @@ bool replenish_stock(store_t *store, char *shelf_name, char *merch_name, size_t 
     }
     
     // the storage location does not exist in store->stock, therefore add shelf:
-    shelf_t *new_shelf = shelf_create(shelf_name, merch_name);
+    shelf_t *new_shelf = ioopm_shelf_create(shelf_name, merch_name);
     new_shelf->quantity = quantity;
     
     ioopm_hash_table_insert(store->stock, string_elem(new_shelf->shelf_name), ptr_elem(new_shelf));
@@ -75,7 +75,7 @@ bool replenish_stock(store_t *store, char *shelf_name, char *merch_name, size_t 
     return true;
 }
 
-bool stock_remove_merch(store_t *store, merch_t *merch_to_clear)
+bool ioopm_stock_remove_merch(store_t *store, merch_t *merch_to_clear)
 {
     ioopm_list_t *shelfs_of_merch = merch_to_clear->shelfs;
     ioopm_list_node_t *current = shelfs_of_merch->first;
@@ -99,7 +99,7 @@ bool stock_remove_merch(store_t *store, merch_t *merch_to_clear)
     return true;
 }
 
-void stock_update_merch_name(merch_t *edited_merch)
+void ioopm_stock_update_merch_name(merch_t *edited_merch)
 {
     char *name_of_merch = edited_merch->name;
     ioopm_list_t *shelfs_of_merch = edited_merch->shelfs;
@@ -119,7 +119,7 @@ void stock_update_merch_name(merch_t *edited_merch)
 
 // This function does not have ownership over the memeory allocated
 // ui.c does when calling this function!!! 
-elem_t *list_shelves(merch_t *merch, size_t *size_out)
+elem_t *ioopm_list_shelves(merch_t *merch, size_t *size_out)
 {
     if (merch->shelfs == NULL)
     {
@@ -127,10 +127,10 @@ elem_t *list_shelves(merch_t *merch, size_t *size_out)
         return NULL;
     }
 
-    *size_out = ioopm_list_size(merch_shelves(merch));
+    *size_out = ioopm_list_size(ioopm_merch_shelves(merch));
     elem_t *shelves = calloc(*size_out, sizeof(elem_t));
     
-    ioopm_list_iterator_t *iter = ioopm_list_iterator_create(merch_shelves(merch));
+    ioopm_list_iterator_t *iter = ioopm_list_iterator_create(ioopm_merch_shelves(merch));
     size_t i = 0;
     while (!ioopm_list_iterator_at_end(iter))
     {
@@ -142,12 +142,12 @@ elem_t *list_shelves(merch_t *merch, size_t *size_out)
     
 
     ioopm_list_iterator_destroy(iter);
-    insertion_sort(shelves, *size_out, comparison_shelf);
+    insertion_sort(shelves, *size_out, ioopm_comparison_shelf);
 
     return shelves;
 }
 
-size_t get_total_stock(merch_t *merch)
+size_t ioopm_get_total_stock(merch_t *merch)
 {
     if (!merch->shelfs) { return 0; }
 

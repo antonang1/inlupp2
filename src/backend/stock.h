@@ -27,7 +27,7 @@ struct shelf
 /// @param b An elem_t holding a shelf_t pointer.
 /// @return Negative if a sorts before b, zero if the names are equal,
 ///         positive if a sorts after b. Returns zero if either is NULL.
-int comparison_shelf(elem_t a, elem_t b);
+int ioopm_comparison_shelf(elem_t a, elem_t b);
 
 /// @brief  Creates a shelf holding a quantity of an item.
 /// @param shelf The shelf's name, for example "A12".
@@ -35,7 +35,7 @@ int comparison_shelf(elem_t a, elem_t b);
 /// @return A new shelf. The caller sets the quantity afterwards.
 /// @note Allocates the struct and copies both strings.
 ///       Free everything with the store's destroy function.
-shelf_t *shelf_create(const char *shelf, const char *merch_name);
+shelf_t *ioopm_shelf_create(const char *shelf, const char *merch_name);
 
 /// @brief Adds stock to a shelf, or creates the shelf if it does not exist.
 /// @param store The store to replenish.
@@ -46,7 +46,7 @@ shelf_t *shelf_create(const char *shelf, const char *merch_name);
 ///         item is not in the store, or if the shelf already holds
 ///         a different item.
 /// @note If the shelf is new, the store takes ownership of it
-bool replenish_stock(store_t *store, char *shelf_name, char *merch_name, size_t quantity);
+bool ioopm_replenish_stock(store_t *store, char *shelf_name, char *merch_name, size_t quantity);
 
 /// @brief Removes an item's shelves from the store's stock table.
 /// @param store The store to remove the shelves from.
@@ -55,7 +55,7 @@ bool replenish_stock(store_t *store, char *shelf_name, char *merch_name, size_t 
 ///         one shelf could not be removed.
 /// @note Removes the shelves from the stock table only. The list inside
 ///       the item is not touched, so freeing it stays the caller's job.
-bool stock_remove_merch(store_t *store, merch_t *merch_to_clear);
+bool ioopm_stock_remove_merch(store_t *store, merch_t *merch_to_clear);
 
 /// @brief Writes the item's current name onto every shelf that holds it.
 /// @param edited_merch The item whose name was changed. Its shelfs list is
@@ -65,7 +65,7 @@ bool stock_remove_merch(store_t *store, merch_t *merch_to_clear);
 /// @note Requires edited_merch->shelfs to be non-NULL. It is called from
 ///       merch_edit, which already checks for that, but the function does
 ///       not check on its own.
-void stock_update_merch_name(merch_t *edited_merch);
+void ioopm_stock_update_merch_name(merch_t *edited_merch);
 
 /// @brief Returns all shelves holding a given item, sorted by shelf name.
 /// @param merch The item whose shelves to list.
@@ -74,7 +74,7 @@ void stock_update_merch_name(merch_t *edited_merch);
 ///         or an empty array if the item has no shelves.
 /// @note The array is owned by the caller, who must free it. 
 ///       The shelves themselves belong to the store and must not be freed.
-elem_t *list_shelves(merch_t *merch, size_t *size_out);
+elem_t *ioopm_list_shelves(merch_t *merch, size_t *size_out);
 
 /// @brief Returns the total number of units of an item, across all its shelves.
 /// @param merch The item whose shelves to sum.
@@ -82,4 +82,4 @@ elem_t *list_shelves(merch_t *merch, size_t *size_out);
 ///         or 0 if the item has no shelves.
 /// @note Reads the shelves through the item's own list, not through the
 ///       store's stock table, so no lookup is needed.
-size_t get_total_stock(merch_t *merch);
+size_t ioopm_get_total_stock(merch_t *merch);

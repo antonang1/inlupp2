@@ -92,7 +92,7 @@ static void ui_add_merch(store_t *store)
     char *merch_desc = ask_question_string("Description of merch: ");
     size_t merch_price = (size_t) ask_question_int("Price of merch: ", is_positive_number);
 
-    merch_add_to_store(store, merch_name, merch_desc, merch_price);
+    ioopm_merch_add_to_store(store, merch_name, merch_desc, merch_price);
     
     free(merch_name);
     free(merch_desc);
@@ -103,7 +103,7 @@ static void ui_list_merchandise(store_t *store)
 {
     printf("-----LIST MERCHANDISE-----\n");
     size_t size = 0;
-    elem_t *array_of_merch = list_merchandise(store, &size);
+    elem_t *array_of_merch = ioopm_list_merchandise(store, &size);
 
     for (size_t i = 0; i < size; i++)
     {
@@ -136,7 +136,7 @@ static void ui_remove_merchandise(store_t *store)
         return;
     }
 
-    bool remove_success = merch_remove_from_store(store, merch_of_intrest);
+    bool remove_success = ioopm_merch_remove_from_store(store, merch_of_intrest);
     if (remove_success)
     {
         printf("The following merch has been removed from store: '%s'\n", merch_of_intrest);    
@@ -169,7 +169,7 @@ static void ui_edit_merch(store_t *store)
         return;
     }
 
-    bool edit_success = merch_edit(store, merch_to_edit, new_name, new_desc, (size_t) new_price);
+    bool edit_success = ioopm_merch_edit(store, merch_to_edit, new_name, new_desc, (size_t) new_price);
 
     if (edit_success)
     {
@@ -205,7 +205,7 @@ static void ui_show_stock(store_t *store)
     merch_t *merch = merch_of_intrest.p;
     
     size_t size = 0;
-    elem_t *array_of_shelfs = list_shelves(merch, &size);
+    elem_t *array_of_shelfs = ioopm_list_shelves(merch, &size);
 
     if (array_of_shelfs == NULL)
     {
@@ -238,7 +238,7 @@ static void ui_replenish(store_t *store)
     char *name = ask_question_string("Enter merchandise name to replenish: ");
     size_t quantity = (size_t) ask_question_int("Quantity of merchandise: ", is_positive_number);
 
-    bool replenished = replenish_stock(store, shelf, name, quantity);
+    bool replenished = ioopm_replenish_stock(store, shelf, name, quantity);
 
     if (!replenished)
     {
@@ -266,8 +266,8 @@ static void ui_replenish(store_t *store)
 
 static void ui_create_cart(store_t *store)
 {
-    cart_t *new_cart = cart_create(store->next_cart_id);
-    add_cart_to_store(store, new_cart);
+    cart_t *new_cart = ioopm_cart_create(store->next_cart_id);
+    ioopm_add_cart_to_store(store, new_cart);
 
     printf("A new cart has been created!\nCart id: '%zu'\nReturning to menu!", new_cart->id);
 
@@ -286,7 +286,7 @@ static void ui_remove_cart(store_t *store)
         return;
     }
 
-    bool removed = remove_cart(store, (size_t) cart_to_remove);
+    bool removed = ioopm_remove_cart(store, (size_t) cart_to_remove);
 
     if (removed)
     {
@@ -307,7 +307,7 @@ static void ui_add_to_cart(store_t *store)
     char *merch_to_add = ask_question_string("Name of merch to add to cart: ");
     int quantity = ask_question_int("Amount: ", is_positive_number);
 
-    bool added = add_to_cart(store, (size_t) cart_of_intrest, merch_to_add, (size_t) quantity);
+    bool added = ioopm_add_to_cart(store, (size_t) cart_of_intrest, merch_to_add, (size_t) quantity);
 
     if (added)
     {
@@ -331,7 +331,7 @@ static void ui_remove_from_cart(store_t *store)
     char *merch_name = ask_question_string("Name of merchandise: ");
     int quantity = ask_question_int("Amount of merchandise to remove from cart: ", is_positive_number);
     
-    bool removed = remove_from_cart(store, (size_t) cart_id, merch_name, (size_t) quantity);
+    bool removed = ioopm_remove_from_cart(store, (size_t) cart_id, merch_name, (size_t) quantity);
 
     if (removed)
     {
@@ -351,7 +351,7 @@ static void ui_calculate_cost(store_t *store)
     printf("-----CALCULATE COST-----\n");
 
     int cart_id = ask_question_int("ID of cart: ", is_positive_number);
-    int price = calculate_cost(store, (size_t) cart_id); 
+    int price = ioopm_calculate_cost(store, (size_t) cart_id); 
     printf("The toal cost is: %d\nReturning to menu!\n", price);
     return; 
 }
@@ -361,8 +361,8 @@ static void ui_checkout(store_t *store)
     printf("-----CHECKOUT CART-----\n");
 
     int cart_id = ask_question_int("ID of cart: ", is_positive_number);
-    int price = calculate_cost(store, (size_t) cart_id);
-    bool checked_out = checkout(store, (size_t) cart_id);
+    int price = ioopm_calculate_cost(store, (size_t) cart_id);
+    bool checked_out = ioopm_checkout(store, (size_t) cart_id);
 
     if (checked_out)
     {
@@ -430,7 +430,6 @@ int event_loop(store_t *store) {
         } 
         else if (user_choice == 'R') 
         {
-            // ska denna ha loopen som remove_merch har? eller ska ingen av de ha det?
             ui_remove_cart(store);
         } 
         else if (user_choice == '+') 

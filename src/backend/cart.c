@@ -3,8 +3,8 @@
 #include "merch.h"
 #include "stock.h"
 
-// OWNERSHIP: cart_create allocate memory but is not responsible for freeing it
-cart_t *cart_create(size_t id)
+// OWNERSHIP: ioopm_cart_create allocate memory but is not responsible for freeing it
+cart_t *ioopm_cart_create(size_t id)
 {
     cart_t *new_cart = calloc(1, sizeof(cart_t));
     if (new_cart == NULL)
@@ -19,7 +19,7 @@ cart_t *cart_create(size_t id)
 }
 
 
-void add_cart_to_store(store_t *store, cart_t *cart)
+void ioopm_add_cart_to_store(store_t *store, cart_t *cart)
 {
     ioopm_hash_table_insert(store->carts, int_elem(cart->id), ptr_elem(cart));
 
@@ -28,7 +28,7 @@ void add_cart_to_store(store_t *store, cart_t *cart)
     return;
 }
 
-size_t get_occupied_stock(store_t *store, merch_t *merch)
+size_t ioopm_get_occupied_stock(store_t *store, merch_t *merch)
 {
     size_t total = 0;
     ioopm_hash_table_iterator_t *iter_over_carts = ioopm_hash_table_iterator_create(store->carts);
@@ -62,7 +62,7 @@ size_t get_occupied_stock(store_t *store, merch_t *merch)
     return total;
 }
     
-bool add_to_cart(store_t *store, size_t id, char *name, size_t quantity)
+bool ioopm_add_to_cart(store_t *store, size_t id, char *name, size_t quantity)
 {
     elem_t cart_found;
     elem_t merch_found;
@@ -74,8 +74,8 @@ bool add_to_cart(store_t *store, size_t id, char *name, size_t quantity)
     cart_t *cart_of_intrest = cart_found.p;
     merch_t *merch_of_intrest = merch_found.p;
 
-    size_t total_stock = get_total_stock(merch_of_intrest);
-    size_t stock_occupied_by_carts = get_occupied_stock(store, merch_of_intrest);
+    size_t total_stock = ioopm_get_total_stock(merch_of_intrest);
+    size_t stock_occupied_by_carts = ioopm_get_occupied_stock(store, merch_of_intrest);
     size_t available_stock = total_stock - stock_occupied_by_carts;
 
 
@@ -94,8 +94,8 @@ bool add_to_cart(store_t *store, size_t id, char *name, size_t quantity)
     return true;
 }
 
-// OWNERSHIP: remove_cart did not allocate memory for the items hash_table but is responsible for freeing it 
-bool remove_cart(store_t *store, size_t id)
+// OWNERSHIP: ioopm_remove_cart did not allocate memory for the items hash_table but is responsible for freeing it 
+bool ioopm_remove_cart(store_t *store, size_t id)
 {
     elem_t cart_elem;
     if (!ioopm_hash_table_lookup(store->carts, int_elem(id), &cart_elem))
@@ -108,7 +108,7 @@ bool remove_cart(store_t *store, size_t id)
     return true;
 }
 
-bool remove_from_cart(store_t *store, size_t id, char *name, size_t quantity)
+bool ioopm_remove_from_cart(store_t *store, size_t id, char *name, size_t quantity)
 {
     elem_t cart_elem;
     if(!ioopm_hash_table_lookup(store->carts, int_elem(id), &cart_elem))
@@ -181,7 +181,7 @@ bool remove_from_cart(store_t *store, size_t id, char *name, size_t quantity)
 
 }
 
-int calculate_cost(store_t *store, size_t id)
+int ioopm_calculate_cost(store_t *store, size_t id)
 {
     elem_t cart_elem;
     if (!ioopm_hash_table_lookup(store->carts, int_elem(id), &cart_elem))
@@ -206,10 +206,10 @@ int calculate_cost(store_t *store, size_t id)
         elem_t value = ioopm_hash_table_iterator_current_value(cart_iter);
         elem_t result;
 
-        if (ioopm_hash_table_lookup(store_merchandise(store), key, &result))
+        if (ioopm_hash_table_lookup(ioopm_store_merchandise(store), key, &result))
         {
             merch_t *merch = result.p;
-            size_t price = (size_t) merch_price(merch);
+            size_t price = (size_t) ioopm_merch_price(merch);
             size_t amount = (size_t) value.i;
             total += price * amount;
         }
@@ -222,7 +222,7 @@ int calculate_cost(store_t *store, size_t id)
 
 }
 
-void stock_decrease_merch(store_t *store, ioopm_hash_table_t *items_of_cart)
+void ioopm_stock_decrease_merch(store_t *store, ioopm_hash_table_t *items_of_cart)
 {
     ioopm_hash_table_iterator_t *iter = ioopm_hash_table_iterator_create(items_of_cart);
     while (!ioopm_hash_table_iterator_at_end(iter))
@@ -289,7 +289,7 @@ void stock_decrease_merch(store_t *store, ioopm_hash_table_t *items_of_cart)
     return;
 }
 
-bool check_if_all_items_valid(store_t *store, ioopm_hash_table_t *items_of_cart)
+bool ioopm_check_if_all_items_valid(store_t *store, ioopm_hash_table_t *items_of_cart)
 {
     if (store == NULL || items_of_cart == NULL)
     {
@@ -319,7 +319,7 @@ bool check_if_all_items_valid(store_t *store, ioopm_hash_table_t *items_of_cart)
 
         merch_t *current_merch = merch_elem.p;
 
-        size_t total_stock = get_total_stock(current_merch);
+        size_t total_stock = ioopm_get_total_stock(current_merch);
 
         // Check whether the cart can still be fullfilled.
         if ((size_t) current_value.i > total_stock)
@@ -335,7 +335,7 @@ bool check_if_all_items_valid(store_t *store, ioopm_hash_table_t *items_of_cart)
     return true;
 }
 
-bool checkout(store_t *store, size_t id)
+bool ioopm_checkout(store_t *store, size_t id)
 {
     elem_t cart_elem;
     if (!ioopm_hash_table_lookup(store->carts, int_elem(id), &cart_elem))
@@ -349,24 +349,24 @@ bool checkout(store_t *store, size_t id)
 
     if (cart == NULL)
     {
-        remove_cart(store, id);
+        ioopm_remove_cart(store, id);
         return true;
     }
     
     if (items_of_cart == NULL)
     {
-        remove_cart(store, id);
+        ioopm_remove_cart(store, id);
         return true;
     }
 
-    if (!check_if_all_items_valid(store, items_of_cart))
+    if (!ioopm_check_if_all_items_valid(store, items_of_cart))
     {
         return false;
     }
     
-    stock_decrease_merch(store, items_of_cart);
+    ioopm_stock_decrease_merch(store, items_of_cart);
 
-    remove_cart(store, id);
+    ioopm_remove_cart(store, id);
 
     return true;
 
