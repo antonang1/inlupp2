@@ -107,7 +107,7 @@ static void ui_list_merchandise(store_t *store)
 
     for (size_t i = 0; i < size; i++)
     {
-        if (i != 0 && i % 2 == 0)
+        if (i != 0 && i % 20 == 0)
         {
             if (confirmation_procedure("Do you want to keep printing merchandise? [Y/N]: ", 'N', "Returning to menu!\n"))
             {
