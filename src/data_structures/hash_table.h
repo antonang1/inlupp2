@@ -5,7 +5,6 @@
 * @file hash_table.h
 * @author Elvin Porter och Anton Äng
 * @date 14/09-2026
-* @brief Simple hash table that maps string keys to integer values.
 *
 * Here typically goes a more extensive explanation of what the header
 * defines. Doxygens tags are words preceeded by either a backslash @\

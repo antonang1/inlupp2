@@ -12,12 +12,12 @@ ioopm_list_iterator_t *ioopm_list_iterator_create(ioopm_list_t *l);
 /// @param iter the iterator
 void ioopm_list_iterator_destroy(ioopm_list_iterator_t *iter);
 
-/// @brief Checks if there are more elements to iterate over
+/// @brief Checks if the iterator is positioned at-the-end
 /// @param iter the iterator
-/// @return false if there is at least one more element
+/// @return true if iter is positioned at-the-end
 bool ioopm_list_iterator_at_end(ioopm_list_iterator_t *iter);
 
-/// @brief Step the iterator forward one step, loops around to first if at end
+/// @brief Step the iterator forward one step, if there is an element to step into.
 /// @param iter the iterator
 void ioopm_list_iterator_advance(ioopm_list_iterator_t *iter);
 

@@ -259,11 +259,11 @@ void test_iterator_iterate(void)
   CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, 20);
 
   ioopm_list_iterator_remove(it); // på 30
-  CU_ASSERT_TRUE(ioopm_list_iterator_at_end(it));
+  CU_ASSERT_FALSE(ioopm_list_iterator_at_end(it));
   CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, 30);
 
-  ioopm_list_iterator_insert(it, v2);             // sätter in 20 igen
-  CU_ASSERT_TRUE(ioopm_list_iterator_at_end(it)); 
+  ioopm_list_iterator_insert(it, v2); // sätter in 20 igen
+  CU_ASSERT_FALSE(ioopm_list_iterator_at_end(it)); 
   CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, 30);
 
   ioopm_list_iterator_destroy(it);
@@ -286,10 +286,7 @@ void test_iterator_insert(void)
   CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, 10);
 
   ioopm_list_iterator_advance(it);
-  CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, 20);
-
-  ioopm_list_iterator_advance(it);
-  CU_ASSERT_EQUAL(ioopm_list_iterator_current(it).i, 30);
+  CU_ASSERT_TRUE(ioopm_list_iterator_at_end(it));
 
   ioopm_list_iterator_destroy(it);
   ioopm_list_destroy(list);

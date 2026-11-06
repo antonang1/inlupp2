@@ -41,6 +41,7 @@ The user interface is not covered by the unit tests.
 The program is built and started with:
 
 make compile_main
+
 ./main
 
 It enters an event loop and reads one action code at a time from
@@ -74,7 +75,9 @@ again.
 ## Testing the interface
 
 The course supplies a script that runs through a sequence of actions:
+
 make compile_main
+
 ./main < webstoretest.txt
 
 
@@ -114,7 +117,6 @@ Tool: gcov, through the --coverage flag
 | stock.c    | 66.10%        | 72.22%          |
 | store.c    | 76.19%        | 87.50%          |
 | utils.c    | 16.07%        | 7.81%           |
-
 | test_merch.c    | 98.26%   | 100.0%          |
 | test_cart.c     | 97.75%%  | 100.0%          |
 | test_stock.c    | 97.40%   | 100.0%          |
@@ -137,7 +139,11 @@ struct gained a destroy function per table, instead of every caller
 freeing its own values. The table therefore takes care of cleaning up
 its own keys and values when it is destroyed, and store_destroy only has
 to destroy three tables. Each table is created with a callback for its
-value type, which frees the value and what that value owns.
+value type, which frees the value and what that value owns. With this 
+implementation, the hash table becomes more generic and modular, since 
+it can store elements of any type through void * pointers. However, the 
+responsibility for deallocating the memory associated with these elements 
+is delegated to the user, who can provide a custom destruction function (elem_destroy_func).
 
 Second, ioopm_hash_table_remove was changed so that it writes the
 removed value to its out-parameter instead of only reporting that
